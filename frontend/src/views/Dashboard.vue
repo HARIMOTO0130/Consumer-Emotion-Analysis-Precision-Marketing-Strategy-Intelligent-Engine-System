@@ -1,17 +1,25 @@
 <template>
   <div class="dashboard">
     <div class="dashboard-container">
-      <!-- 页面标题和时间控制 -->
       <div class="dashboard-title-section">
         <div class="title-content">
-          <h2>📊 情感分析仪表盘总览</h2>
-          <p class="dashboard-subtitle">实时监控消费者情感变化与营销策略效果</p>
+          <div style="display: flex;gap: 8px">
+            <mdicon name="dashboard" size="35" />
+            <div>
+              <h2>情感分析仪表盘总览</h2>
+              <p class="dashboard-subtitle">实时监控消费者情感变化与营销策略效果</p>
+            </div>
+          </div>
+          
         </div>
         <div class="dashboard-controls">
           <div class="time-control">
-            <span class="control-label" id="time-range-label">📅 时间范围</span>
+            <span class="control-label" id="time-range-label">
+              <mdicon name="calendar-month" size="20" />
+              时间范围
+            </span>
             <el-select 
-              v-model="timeRange" 
+              v-model="timeRange"
               class="time-select"
               placeholder="选择时间范围"
               @change="handleTimeChange"
@@ -36,7 +44,7 @@
             tabindex="0"
             role="button"
           >
-            <span class="refresh-icon">{{ loading ? '⏳' : '🔄' }}</span>
+            <mdicon name="refresh" size="20" color="#fff" />
             <span>{{ loading ? '加载中...' : '刷新数据' }}</span>
           </button>
         </div>
@@ -49,6 +57,7 @@
         type="error"
         show-icon
         closable
+        center
         @close="error = null; errorMessage = ''"
         class="error-alert"
       >
@@ -61,11 +70,7 @@
       </el-alert>
 
       <!-- 加载遮罩 -->
-      <div v-if="loading" class="loading-overlay">
-        <div class="loading-content">
-          <el-spinner size="large" />
-          <p>{{ loadingText }}</p>
-        </div>
+      <div v-if="loading" v-loading="loading" class="loading-overlay">
       </div>
 
       <!-- 实时概览卡片 -->
@@ -316,7 +321,7 @@
                     <span class="insight-type">{{ insight.type }}</span>
                     <span class="insight-date">{{ insight.date }}</span>
                   </div>
-                  <div class="insight-text">{{ insight.text }}</div>
+                  <div class="insight-text">{{ insight.title }}</div>
                   <div class="insight-action">
                     <el-button 
                       size="small" 
@@ -828,7 +833,8 @@ const fetchData = async () => {
   
   try {
     // 使用批量数据API，减少HTTP请求次数
-    const batchResponse = await axios.get('http://localhost:8000/api/batch-data', {
+    const data_url = import.meta.env.VITE_SERVER_API_ENDPOINT || "http://localhost:8000";
+    const batchResponse = await axios.get( data_url + '/batch-data', {
       params: { time_range: timeRange.value }
     })
     
@@ -1095,17 +1101,15 @@ onMounted(async () => {
 }
 
 .error-details {
-  margin-top: 10px;
   display: flex;
-  justify-content: space-between;
+  justify-content:center;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
 }
 
 .error-details p {
-  margin: 0;
-  color: #666;
+  color: var(--color-info-dark);
 }
 
 /* 加载遮罩样式 */
@@ -1199,7 +1203,7 @@ onMounted(async () => {
   }
   
   .dashboard-controls {
-    justify-content: space-between;
+    justify-content: space-around;
   }
   
   .overview-grid {
@@ -1247,7 +1251,7 @@ onMounted(async () => {
   }
   
   .dashboard-controls {
-    flex-direction: column;
+    justify-content: space-around;
     align-items: stretch;
     gap: 10px;
   }
@@ -1324,6 +1328,9 @@ onMounted(async () => {
 }
 
 .control-label {
+  align-items: center;
+  display: flex;
+  gap:4px;
   font-size: 14px;
   font-weight: 500;
   color: #546e7a;
@@ -1335,7 +1342,7 @@ onMounted(async () => {
 }
 
 .btn-refresh {
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+  background-color: var(--color-primary);
   border: none;
   color: white;
   padding: 10px 20px;
@@ -1346,13 +1353,10 @@ onMounted(async () => {
   gap: 8px;
   transition: all 0.3s ease;
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
 }
 
 .btn-refresh:hover:not(:disabled) {
-  background: linear-gradient(135deg, #40a9ff 0%, #5cdbd3 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.4);
+  background-color: var(--color-primary-hover);
 }
 
 .btn-refresh:disabled {

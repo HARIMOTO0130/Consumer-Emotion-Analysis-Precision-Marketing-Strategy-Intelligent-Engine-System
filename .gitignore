@@ -43,6 +43,11 @@ frontend/node_modules/
 # 后端依赖
 backend/venv/
 backend/env/
+# uv 使用的缓存与依赖
+**/__pycache__/
+**/.venv/
+**/.egg-info/
+**/.env
 
 # 代码提取文件
 code_extracted.txt
