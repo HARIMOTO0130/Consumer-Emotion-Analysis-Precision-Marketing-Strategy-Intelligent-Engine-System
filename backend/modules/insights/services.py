@@ -2,12 +2,6 @@ from typing import List, Dict, Any
 import logging
 from core.database import database
 from .models import insights_table
-from core.enum_mapping import (
-    get_mapped_value,
-    INSIGHT_TYPE_MAP,
-    PRIORITY_MAP,
-    ACTION_TEXT_MAP
-)
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +17,11 @@ class InsightsService:
                 record = dict(r)
                 insights_list.append({
                     "id": record.get("id"),
-                    "type": get_mapped_value(INSIGHT_TYPE_MAP, record.get("type")),
-                    "date": record["date"].isoformat() if record.get("date") else None,
+                    "type": record.get("type"),
+                    "date": record.get("date"),
                     "text": record.get("text"),
                     "action": record.get("action"),
-                    "actionText": get_mapped_value(ACTION_TEXT_MAP, record.get("action_text")) 
+                    "actionText": record.get("action_text") 
                 })
             return insights_list
         except Exception as e:
@@ -48,10 +42,10 @@ class InsightsService:
                     "title": record.get("title"),
                     "description": record.get("description"),
                     "recommendation": record.get("recommendation"),
-                    "priority": get_mapped_value(PRIORITY_MAP, record.get("priority")),
+                    "priority": record.get("priority"),
                     "expectedOutcome": record.get("expected_outcome"),
                     "action": record.get("action"),
-                    "actionText": get_mapped_value(ACTION_TEXT_MAP, record.get("action_text"))
+                    "actionText": record.get("action_text")
                 })
             return detailed_insights_list
         except Exception as e:

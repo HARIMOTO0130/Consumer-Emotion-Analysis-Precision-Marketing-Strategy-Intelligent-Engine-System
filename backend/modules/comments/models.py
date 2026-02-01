@@ -11,5 +11,5 @@ comments_table = sqlalchemy.Table(
     sqlalchemy.Column("emotion", sqlalchemy.String(20)),
     sqlalchemy.Column("sentiment", sqlalchemy.String(20)),
     sqlalchemy.Column("intensity", sqlalchemy.String(10)),
-    sqlalchemy.Column("timestamp", sqlalchemy.TIMESTAMP),
+    sqlalchemy.Column("timestamp", sqlalchemy.String(20)),
 )

@@ -2,12 +2,6 @@ from core.database import database
 from .models import marketing_activities_table
 from typing import List, Dict, Any
 import logging
-from core.enum_mapping import (
-    get_mapped_value,
-    MARKETING_NAME_MAP,
-    EFFECT_MAP,
-    PRIORITY_MAP
-)
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +17,13 @@ class MarketingService:
                 row = dict(r)
                 output.append({
                     "id": row.get("id"),
-                    "name": get_mapped_value(MARKETING_NAME_MAP, row.get("name")),
+                    "name": row.get("name"),
                     "participants": row.get("participants"),
-                    "effect": get_mapped_value(EFFECT_MAP, row.get("effect")),
+                    "effect": row.get("effect"),
                     "engagement": float(row.get("engagement", 0.0)),
                     "conversion": float(row.get("conversion", 0.0)),
-                    "date": row["date"].isoformat() if row.get("date") else None,
-                    "priority": get_mapped_value(PRIORITY_MAP, row.get("priority"))
+                    "date": row.get("date"),
+                    "priority": row.get("priority")
                 })
             return output
         except Exception as e:

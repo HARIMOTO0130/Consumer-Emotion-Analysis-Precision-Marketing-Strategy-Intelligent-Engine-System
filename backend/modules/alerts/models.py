@@ -8,6 +8,6 @@ alerts_table = sqlalchemy.Table(
     sqlalchemy.Column("title", sqlalchemy.String(255)),
     sqlalchemy.Column("type", sqlalchemy.String(50)),
     sqlalchemy.Column("severity", sqlalchemy.String(20)),
-    sqlalchemy.Column("date", sqlalchemy.TIMESTAMP),
+    sqlalchemy.Column("date", sqlalchemy.String(20)),
     sqlalchemy.Column("status", sqlalchemy.String(20)),
 )

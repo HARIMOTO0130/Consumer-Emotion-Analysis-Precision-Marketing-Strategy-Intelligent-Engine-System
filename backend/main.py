@@ -49,7 +49,7 @@ async def get_batch_data():
         CommentsService.get_recent_comments(),
         CommentsService.get_detailed_comments(),
         MarketingService.get_activities_data(),
-        InsightsService.get_detailed_insights(),
+        InsightsService.get_insights_data(),
         InsightsService.get_detailed_insights(),
         TrendInsightsService.get_trend_insights(),
         AlertsService.get_alerts(),

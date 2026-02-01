@@ -10,6 +10,6 @@ marketing_activities_table = sqlalchemy.Table(
     sqlalchemy.Column("effect", sqlalchemy.String(20)),
     sqlalchemy.Column("engagement", sqlalchemy.Float),
     sqlalchemy.Column("conversion", sqlalchemy.Float),
-    sqlalchemy.Column("date", sqlalchemy.TIMESTAMP),
+    sqlalchemy.Column("date", sqlalchemy.String(20)),
     sqlalchemy.Column("priority", sqlalchemy.String(20)),
 )

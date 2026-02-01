@@ -2,12 +2,6 @@ from core.database import database
 from typing import List, Dict, Any
 from .models import comments_table
 import logging
-from core.enum_mapping import (
-    get_mapped_value,
-    CHANNEL_MAP,
-    EMOTION_MAP,
-    INTENSITY_MAP
-)
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +15,9 @@ class CommentsService:
                 {
                     "id": dict(r).get("id"),
                     "text": dict(r).get("text"),
-                    "source": get_mapped_value(CHANNEL_MAP, dict(r).get("source")),
+                    "source": dict(r).get("source"),
                     "time": dict(r).get("time"),
-                    "emotion": get_mapped_value(EMOTION_MAP, dict(r).get("emotion"))
+                    "emotion": dict(r).get("emotion")
                 }
                 for r in results
             ]
@@ -40,10 +34,10 @@ class CommentsService:
             return [
                 {
                     "text": dict(r).get("text"),
-                    "source": get_mapped_value(CHANNEL_MAP, dict(r).get("source")),
-                    "sentiment": get_mapped_value(EMOTION_MAP, dict(r).get("sentiment")),
-                    "intensity": get_mapped_value(INTENSITY_MAP, dict(r).get("intensity")),
-                    "timestamp": dict(r)["timestamp"].isoformat() if dict(r).get("timestamp") else None
+                    "source": dict(r).get("source"),
+                    "sentiment": dict(r).get("sentiment"),
+                    "intensity": dict(r).get("intensity"),
+                    "timestamp": dict(r).get("timestamp")
                 }
                 for r in results
             ]

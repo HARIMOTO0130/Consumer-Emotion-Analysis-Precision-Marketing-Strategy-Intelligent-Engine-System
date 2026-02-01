@@ -147,7 +147,7 @@
                 <div class="dist-info">
                   <div class="dist-range">
                     <span class="range-icon">{{ getChannelIcon(index) }}</span>
-                    <span>{{ item.channel }}</span>
+                    <span>{{ getChannelName(item.channel) }}</span>
                   </div>
                   <div class="dist-count">{{ item.positive }}/{{ item.negative }}</div>
                   <div class="dist-percentage">正面: {{ item.positivePercent }}%</div>
@@ -194,7 +194,7 @@
                 <div class="stream-content">
                   <div class="stream-text">{{ item.text }}</div>
                   <div class="stream-meta">
-                    <span class="stream-source">{{ item.source }}</span>
+                    <span class="stream-source">{{ getChannelName(item.source) }}</span>
                     <span class="stream-time">{{ item.time }}</span>
                   </div>
                 </div>
@@ -286,7 +286,7 @@
                     <div class="marketing-header">
                       <span class="activity-name">{{ activity.name }}</span>
                       <span class="effect-badge" :class="`badge-${activity.effect}`">
-                        效果: {{ activity.effect }}
+                        效果: {{ getEffectName(activity.effect) }}
                       </span>
                     </div>
                     <div class="marketing-details">
@@ -299,7 +299,7 @@
                         <span class="detail-value">{{ activity.conversion }}%</span>
                       </div>
                     </div>
-                    <div class="marketing-time">{{ activity.date }}</div>
+                    <div class="marketing-time">{{ formatDate(activity.date,"yyyy-mm-dd") }}</div>
                   </div>
                 </div>
               </div>
@@ -318,10 +318,10 @@
               <div class="insight-content">
                 <div class="insight-item" v-for="insight in insights" :key="insight.id">
                   <div class="insight-header">
-                    <span class="insight-type">{{ insight.type }}</span>
-                    <span class="insight-date">{{ insight.date }}</span>
+                    <span class="insight-type">{{ getActionTypeName(insight.type) }}</span>
+                    <span class="insight-date">{{ formatDate(insight.date,"yyyy-mm-dd") }}</span>
                   </div>
-                  <div class="insight-text">{{ insight.title }}</div>
+                  <div class="insight-text">{{ insight.text }}</div>
                   <div class="insight-action">
                     <el-button 
                       size="small" 
@@ -366,16 +366,28 @@
         <div class="comment-table">
           <el-table :data="detailedComments" style="width: 100%">
             <el-table-column prop="text" label="评论内容" width="300" />
-            <el-table-column prop="source" label="来源" width="120" />
+            <el-table-column prop="source" label="来源" width="120">
+              <template #default="{ row }">
+                  {{getChannelName(row.source)}}
+              </template>
+            </el-table-column>
             <el-table-column prop="sentiment" label="情感倾向" width="100">
               <template #default="{ row }">
-                <el-tag :type="row.sentiment === '正面' ? 'success' : row.sentiment === '负面' ? 'danger' : 'info'">
-                  {{ row.sentiment }}
+                <el-tag :type="row.sentiment === 'positive' ? 'success' : row.sentiment === 'negative' ? 'danger' : 'info'">
+                  {{ getEmotionName(row.sentiment) }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="intensity" label="情感强度" width="100" />
-            <el-table-column prop="timestamp" label="时间" width="150" />
+            <el-table-column prop="intensity" label="情感强度" width="100">
+              <template #default="{ row }">
+                  {{getIntensityName(row.intensity)}}
+              </template>
+            </el-table-column>
+            <el-table-column prop="timestamp" label="时间" width="150" >
+              <template #default="{row}">
+                {{formatDate(row.timestamp, "yyyy-mm-dd hh:mm:ss")}}
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </div>
@@ -414,9 +426,9 @@
         <p>近期开展的营销活动效果评估及情感影响分析：</p>
         <div class="activity-detail" v-for="activity in marketingActivities" :key="activity.id" style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
           <h4>{{ activity.name }}</h4>
-          <p>活动时间：{{ activity.date }}</p>
+          <p>活动时间：{{ formatDate(activity.date, "yyyy-mm-dd") }}</p>
           <p>参与人数：{{ activity.participants }}</p>
-          <p>情感影响度：{{ activity.effect }}</p>
+          <p>情感影响度：{{ getEffectName(activity.effect) }}</p>
           <p>参与度：{{ activity.engagement }}%</p>
           <p>转化率：{{ activity.conversion }}%</p>
           <div class="chart-placeholder">
@@ -435,7 +447,7 @@
           <h4>{{ insight.title }}</h4>
           <p>{{ insight.description }}</p>
           <p><strong>建议行动：</strong>{{ insight.recommendation }}</p>
-          <p><strong>紧急程度：</strong>{{ insight.priority }}</p>
+          <p><strong>紧急程度：</strong>{{ getPriorityName(insight.priority) }}</p>
           <p><strong>预期效果：</strong>{{ insight.expectedOutcome }}</p>
         </div>
       </div>
@@ -526,6 +538,18 @@ import {
   TitleComponent
 } from 'echarts/components'
 import axios from 'axios'
+import {
+  getChannelName,
+  getEmotionName,
+  getEffectName,
+  getActionTypeName,
+  getPriorityName,
+  getIntensityName,
+  getInsightTypeName
+} from '../utils/enum-mapping'
+import {
+  formatDate
+} from "../utils/time-format"
 
 // 注册ECharts组件
 use([

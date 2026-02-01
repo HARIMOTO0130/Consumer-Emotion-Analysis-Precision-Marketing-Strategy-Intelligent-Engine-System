@@ -84,6 +84,12 @@ export const ALERT_STATUS_MAP = {
   'completed': '已完成'
 };
 
+export const ACTION_TYPE = {
+  'trend': "趋势洞察",
+  "risk": "风险预警",
+  "opportunity":"机会发现"
+}
+
 /**
  * 通用枚举值映射函数
  * @param {Object} map - 映射表
@@ -147,4 +153,7 @@ export function getTrendName(key, defaultValue = '') {
 // 快捷方法：预警状态映射
 export function getAlertStatusName(key, defaultValue = '') {
   return getMappedValue(ALERT_STATUS_MAP, key, defaultValue);
+}
+export function getActionTypeName(key, defaultValue = '') {
+  return getMappedValue(ACTION_TYPE, key, defaultValue);
 }

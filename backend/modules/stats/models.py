@@ -13,5 +13,5 @@ stats_table = sqlalchemy.Table(
     sqlalchemy.Column("alert_count", sqlalchemy.Integer),
     sqlalchemy.Column("hot_topic_count", sqlalchemy.Integer),
     sqlalchemy.Column("top_topic", sqlalchemy.String(100)),
-    sqlalchemy.Column("updated_at", sqlalchemy.TIMESTAMP, server_default=sqlalchemy.func.now(), onupdate=sqlalchemy.func.now()),  # 自动更新时间
+    sqlalchemy.Column("updated_at", sqlalchemy.String(20)),
 )

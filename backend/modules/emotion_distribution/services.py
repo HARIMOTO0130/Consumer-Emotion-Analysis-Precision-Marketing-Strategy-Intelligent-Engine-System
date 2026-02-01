@@ -2,7 +2,6 @@ from core.database import database
 from .models import emotion_distribution_table
 from typing import List, Dict, Any
 import logging
-from core.enum_mapping import get_mapped_value, CHANNEL_MAP
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +13,7 @@ class EmotionDistributionService:
             results = await database.fetch_all(query)
             return [
                 {
-                    "channel": get_mapped_value(CHANNEL_MAP, dict(r).get("channel")),
+                    "channel": dict(r).get("channel"),
                     "positive": dict(r).get("positive"),
                     "negative": dict(r).get("negative"),
                     "positivePercent": float(dict(r).get("positive_percent", 0.0))

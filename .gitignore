@@ -46,7 +46,8 @@ backend/env/
 # uv 使用的缓存与依赖
 **/__pycache__/
 **/.venv/
-**/.egg-info/
+*.egg-info/
+*.egg
 **/.env
 
 # 代码提取文件
