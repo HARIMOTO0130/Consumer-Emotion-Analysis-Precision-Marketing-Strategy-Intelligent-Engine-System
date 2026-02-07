@@ -26,11 +26,8 @@ const toggleMobileMenu = () => {
         <!-- 品牌区域 -->
         <div class="navbar-brand">
           <h1 class="brand-title">
-            消费者情感分析与精准营销策略的智能引擎
+            知湘知味
           </h1>
-          <p class="brand-subtitle">
-            Consumer Emotion Analysis & Precision Marketing Strategy Intelligent Engine System
-          </p>
         </div>
         
         <!-- 桌面端导航菜单 -->
@@ -152,12 +149,13 @@ const toggleMobileMenu = () => {
 .navbar-brand {
   flex: 1;
   min-width: 0;
+  justify-items: start;
   max-width: 400px;
 }
 
 .brand-title {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 800;
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;

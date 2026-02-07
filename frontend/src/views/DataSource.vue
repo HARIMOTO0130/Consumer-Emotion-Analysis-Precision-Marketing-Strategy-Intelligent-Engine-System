@@ -1,19 +1,16 @@
 <template>
   <div class="data-source-container">
-    <!-- 页面标题 -->
-    <div class="page-header">
-      <h1>📡 数据源管理与监测</h1>
-      <p class="subtitle">Data Source Management & Monitoring Platform</p>
-    </div>
 
     <!-- 功能选项卡 -->
     <div class="tabs-container">
+          <div class="">
+      <h2>数据源管理与监测</h2>
+    </div>
       <el-tabs v-model="activeTab" class="function-tabs">
         <el-tab-pane label="多源数据集成" name="integration">
           <div class="tab-content">
             <!-- 数据源管理 -->
             <div class="integration-section">
-              <h3>数据源接入管理</h3>
               <el-form :model="integrationForm" label-width="120px" class="integration-form">
                 <el-row :gutter="20">
                   <el-col :span="12">
@@ -28,7 +25,6 @@
                         <el-option label="电商" value="ecommerce" />
                         <el-option label="客服" value="customer_service" />
                         <el-option label="调研数据" value="survey" />
-                        <el-option label="邮件反馈" value="email_feedback" />
                         <el-option label="其他" value="other" />
                       </el-select>
                     </el-form-item>
@@ -130,7 +126,6 @@
         <el-tab-pane label="监测主题配置" name="monitoring">
           <div class="tab-content">
             <div class="monitoring-section">
-              <h3>监测主题配置</h3>
               <el-form :model="monitoringForm" label-width="120px" class="monitoring-form">
                 <el-row :gutter="20">
                   <el-col :span="12">
@@ -351,35 +346,35 @@
               <h3>实时监控仪表盘</h3>
               <div class="dashboard-stats">
                 <div class="stat-card">
-                  <div class="stat-icon">📊</div>
+                  <div class="stat-icon"><mdicon name="data-table-outline-rounded" size="50" color="var(--color-info)"/></div>
                   <div class="stat-content">
                     <div class="stat-value">{{ dashboardStats.totalData }}</div>
                     <div class="stat-label">总数据量</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-icon">📈</div>
+                  <div class="stat-icon"><mdicon name="fiber-new-rounded" size="50" color="var(--color-info)"/></div>
                   <div class="stat-content">
                     <div class="stat-value">{{ dashboardStats.todayData }}</div>
                     <div class="stat-label">今日新增</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-icon">😊</div>
+                  <div class="stat-icon"><mdicon name="heart-smile-outline-rounded" size="50" color="var(--color-info)"/></div>
                   <div class="stat-content">
                     <div class="stat-value">{{ dashboardStats.positiveRate }}%</div>
                     <div class="stat-label">正面情感率</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-icon">🔥</div>
+                  <div class="stat-icon"><mdicon name="bookmark-check-outline-rounded" size="50" color="var(--color-info)"/></div>
                   <div class="stat-content">
                     <div class="stat-value">{{ dashboardStats.topicCount }}</div>
                     <div class="stat-label">监测主题数</div>
                   </div>
                 </div>
                 <div class="stat-card">
-                  <div class="stat-icon">💡</div>
+                  <div class="stat-icon"><mdicon name="star-rate-rounded" size="50" color="var(--color-info)"/></div>
                   <div class="stat-content">
                     <div class="stat-value">{{ dashboardStats.qualityScore }}</div>
                     <div class="stat-label">数据质量评分</div>
@@ -404,7 +399,7 @@
                   <el-table-column prop="trend" label="趋势" width="100">
                     <template #default="{ row }">
                       <span :style="{ color: row.trend === '上升' ? 'green' : row.trend === '下降' ? 'red' : 'orange' }">
-                        {{ row.trend === '上升' ? '📈 上升' : row.trend === '下降' ? '📉 下降' : '➡️ 平稳' }}
+                        {{ row.trend === '上升' ? '上升' : row.trend === '下降' ? '下降' : '平稳' }}
                       </span>
                     </template>
                   </el-table-column>
@@ -454,24 +449,36 @@ const platforms = ref([
 const connectedSources = ref([
   {
     id: 1,
-    name: '微博API',
+    name: '微博',
     type: 'social_media',
     type_name: '社交媒体',
     platform: '微博',
     status: 'active',
-    lastSync: '2023-12-01 10:30',
+    lastSync: '2026-02-03 10:25',
     dataCount: 12450,
     createTime: '2023-11-15',
     description: '官方API接入'
   },
   {
     id: 2,
-    name: '抖音开放平台',
+    name: '美团H5',
     type: 'social_media',
-    type_name: '社交媒体',
-    platform: '抖音',
+    type_name: '电商',
+    platform: '美团外卖',
     status: 'active',
-    lastSync: '2023-12-01 10:25',
+    lastSync: '2026-02-03 10:25',
+    dataCount: 8760,
+    createTime: '2023-11-20',
+    description: '关键词监控'
+  },
+  {
+    id: 2,
+    name: '小红书',
+    type: 'social_media',
+    type_name: '社交平台',
+    platform: '小红书',
+    status: 'active',
+    lastSync: '2026-02-03 10:25',
     dataCount: 8760,
     createTime: '2023-11-20',
     description: '关键词监控'
@@ -486,8 +493,8 @@ const monitoringTopics = ref([
     targetType: 'brand',
     targetTypeName: '品牌',
     status: 'active',
-    startTime: '2023-11-30 09:00',
-    dataCount: 3456,
+    startTime: '2026-02-03 09:00',
+    dataCount: 23,
     dataSources: [1, 2],
     keywords: '品牌, 声誉, 形象'
   },
@@ -497,8 +504,8 @@ const monitoringTopics = ref([
     targetType: 'product',
     targetTypeName: '产品',
     status: 'active',
-    startTime: '2023-11-25 14:30',
-    dataCount: 2890,
+    startTime: '2026-02-02 14:30',
+    dataCount: 8,
     dataSources: [1],
     keywords: '新产品, 体验, 功能'
   }
@@ -506,11 +513,11 @@ const monitoringTopics = ref([
 
 // 数据质量指标
 const qualityMetrics = ref({
-  completeness: 92,
-  accuracy: 88,
-  timeliness: 95,
-  consistency: 90,
-  validity: 87
+  completeness: 78,
+  accuracy: 74,
+  timeliness: 84,
+  consistency: 82,
+  validity: 74
 })
 
 // 数据质量问题
@@ -523,23 +530,23 @@ const qualityIssues = ref([
 
 // 仪表盘统计
 const dashboardStats = ref({
-  totalData: 34567,
-  todayData: 1245,
-  positiveRate: 72.5,
+  totalData: 1783,
+  todayData: 874,
+  positiveRate: 72.3,
   positiveChange: 3.2,
-  topicCount: 24,
+  topicCount: 2,
   trendingTopic: '#新产品体验#',
-  qualityScore: 87,
+  qualityScore: 82,
   qualityTrend: 2
 })
 
 // 话题聚类
 const topicClusters = ref([
-  { rank: 1, name: '新产品体验', mentionCount: 1245, sentiment: '正面', trend: '上升', duration: '3天' },
-  { rank: 2, name: '物流服务', mentionCount: 987, sentiment: '中性', trend: '平稳', duration: '持续' },
-  { rank: 3, name: '价格策略', mentionCount: 765, sentiment: '负面', trend: '下降', duration: '5天' },
-  { rank: 4, name: '售后服务', mentionCount: 654, sentiment: '正面', trend: '上升', duration: '2天' },
-  { rank: 5, name: '品牌声誉', mentionCount: 543, sentiment: '正面', trend: '平稳', duration: '持续' }
+  { rank: 1, name: '新产品体验', mentionCount: 13, sentiment: '正面', trend: '上升', duration: '3天' },
+  { rank: 2, name: '物流服务', mentionCount: 5, sentiment: '中性', trend: '平稳', duration: '持续' },
+  { rank: 3, name: '价格策略', mentionCount: 3, sentiment: '负面', trend: '下降', duration: '5天' },
+  { rank: 4, name: '售后服务', mentionCount: 20, sentiment: '正面', trend: '上升', duration: '2天' },
+  { rank: 5, name: '品牌声誉', mentionCount: 47, sentiment: '正面', trend: '平稳', duration: '持续' }
 ])
 
 // 方法
@@ -732,7 +739,7 @@ onMounted(() => {
   font-size: 18px;
   margin-bottom: 20px;
   color: #333;
-  border-bottom: 2px solid #1890ff;
+  border-bottom: 2px solid var(--color-primary-hover);
   padding-bottom: 10px;
 }
 

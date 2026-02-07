@@ -1,13 +1,9 @@
 <template>
   <div class="marketing-strategy-container">
-    <!-- 页面标题 -->
-    <div class="page-header">
-      <h1>🎯 精准营销策略推荐</h1>
-      <p class="subtitle">Precision Marketing Strategy Recommendation System</p>
-    </div>
 
     <!-- 功能选项卡 -->
     <div class="tabs-container">
+      <h2>精准营销策略推荐</h2>
       <el-tabs v-model="activeTab" class="function-tabs">
         <el-tab-pane label="智能策略推荐" name="recommendation">
           <div class="tab-content">
@@ -121,7 +117,6 @@
                 >
                   <div class="strategy-header">
                     <div class="strategy-title">
-                      <span class="strategy-icon">{{ getStrategyIcon(strategy.type) }}</span>
                       <h4>{{ strategy.name }}</h4>
                     </div>
                     <div class="strategy-meta">
@@ -435,8 +430,9 @@
                 <div class="chart-container">
                   <!-- 这里可以集成ECharts图表 -->
                   <div class="chart-placeholder">
-                    <p>营销效果趋势图表</p>
-                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=" alt="效果趋势图" style="width: 100%; height: 300px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;" />
+                      <div class="chart-container" style="width: 100%; height: 200px;">
+                        <div id="trend-chart" style="width: 100%; height: 100%;"></div>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -484,7 +480,6 @@
                 >
                   <div class="insight-header">
                     <div class="insight-type">
-                      <span class="type-icon">{{ getInsightIcon(insight.type) }}</span>
                       <span class="type-label">{{ getInsightTypeLabel(insight.type) }}</span>
                     </div>
                     <div class="insight-meta">
@@ -591,9 +586,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { initTrendChart } from '@components/strategy-recommend/tendency-chart'
 
 const router = useRouter()
 
@@ -677,42 +673,32 @@ const marketingActivities = ref([
     id: 1,
     name: '双11促销活动',
     type: 'promotion',
-    startTime: '2023-11-11 00:00:00',
-    endTime: '2023-11-11 23:59:59',
+    startTime: '2025-11-11 00:00:00',
+    endTime: '2025-11-11 23:59:59',
     status: '已结束',
-    budget: '50万',
-    participants: '2.4万'
+    budget: '3万',
+    participants: '240'
   },
   {
     id: 2,
     name: '新品上市推广',
     type: 'new_product',
-    startTime: '2023-10-15 00:00:00',
-    endTime: '2023-10-22 23:59:59',
+    startTime: '2025-10-15 00:00:00',
+    endTime: '2025-10-22 23:59:59',
     status: '已结束',
-    budget: '30万',
-    participants: '1.8万'
+    budget: '4.7万',
+    participants: '430'
   },
   {
     id: 3,
     name: '品牌联合营销',
     type: 'brand_cooperation',
-    startTime: '2023-09-20 00:00:00',
-    endTime: '2023-09-27 23:59:59',
+    startTime: '2025-09-20 00:00:00',
+    endTime: '2025-09-27 23:59:59',
     status: '已结束',
-    budget: '20万',
-    participants: '1.2万'
+    budget: '2.3万',
+    participants: '120'
   },
-  {
-    id: 4,
-    name: '圣诞节活动',
-    type: 'promotion',
-    startTime: '2023-12-20 00:00:00',
-    endTime: '2023-12-25 23:59:59',
-    status: '进行中',
-    budget: '25万',
-    participants: '8.5千'
-  }
 ])
 
 // 效果指标
@@ -729,10 +715,10 @@ const effectMetrics = ref({
 
 // 受众分析
 const audienceAnalysis = ref([
-  { segment: '新用户', count: 1200, engagement: 75, conversion: 8, revenue: '23.4万' },
-  { segment: '老用户', count: 2800, engagement: 92, conversion: 15, revenue: '78.6万' },
-  { segment: '高价值用户', count: 500, engagement: 98, conversion: 25, revenue: '45.2万' },
-  { segment: '流失风险用户', count: 800, engagement: 65, conversion: 6, revenue: '12.8万' }
+  { segment: '新用户', count: 23, engagement: 75, conversion: 8, revenue: '219' },
+  { segment: '老用户', count: 87, engagement: 92, conversion: 47, revenue: '768' },
+  { segment: '高价值用户', count: 76, engagement: 98, conversion: 25, revenue: '23' },
+  { segment: '流失风险用户', count: 8, engagement: 65, conversion: 6, revenue: '213' }
 ])
 
 // 营销洞察
@@ -941,6 +927,7 @@ const handleLogout = () => {
 // 生命周期
 onMounted(() => {
   console.log('精准营销策略推荐组件已挂载')
+    initTrendChart()
 })
 </script>
 
@@ -1138,7 +1125,7 @@ onMounted(() => {
   font-size: 18px;
   margin-bottom: 20px;
   color: #333;
-  border-bottom: 2px solid #1890ff;
+  border-bottom: 2px solid var(--color-primary-hover);
   padding-bottom: 10px;
 }
 
@@ -1171,7 +1158,7 @@ onMounted(() => {
 }
 
 .strategy-card.priority-high {
-  border-left: 4px solid #ff4d4f;
+  border-left: 4px solid var(--color-danger);
 }
 
 .strategy-card.priority-medium {
@@ -1343,7 +1330,7 @@ onMounted(() => {
 
 .progress-fill {
   height: 100%;
-  background-color: #1890ff;
+  background-color: var(--color-primary-hover);
   border-radius: 10px;
   transition: width 0.3s ease;
 }
@@ -1384,11 +1371,11 @@ onMounted(() => {
 }
 
 .insight-card.type-risk {
-  border-left: 4px solid #ff4d4f;
+  border-left: 4px solid var(--color-danger);
 }
 
 .insight-card.type-trend {
-  border-left: 4px solid #1890ff;
+  border-left: 4px solid var(--color-primary-hover);
 }
 
 .insight-header {

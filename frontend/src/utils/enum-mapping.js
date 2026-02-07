@@ -14,7 +14,8 @@ export const CHANNEL_MAP = {
   'tmall': '天猫',
   'xiaohongshu': '小红书',
   'pdd': '拼多多',
-  'ecommerce': '电商平台'
+  'ecommerce': '电商平台',
+  'meituan':'美团 h5'
 };
 
 export const EMOTION_MAP = {

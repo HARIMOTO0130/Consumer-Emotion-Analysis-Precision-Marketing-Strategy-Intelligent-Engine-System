@@ -76,7 +76,7 @@
       <!-- 实时概览卡片 -->
       <div class="overview-grid">
         <div class="overview-card card-total" @click="openEmotionOverviewDialog">
-          <div class="card-icon">😊</div>
+          <div class="card-icon"><mdicon name="chat-outline-rounded" size="50" color="var(--color-primary)"/></div>
           <div class="card-content">
             <div class="card-value">{{ stats.totalReviews }}</div>
             <div class="card-label">今日新增评论</div>
@@ -88,31 +88,29 @@
         </div>
         
         <div class="overview-card card-success" @click="openTrendAnalysisDialog">
-          <div class="card-icon">📈</div>
+          <div class="card-icon"><mdicon name="show-chart" size="50" color="var(--color-success)"/></div>
           <div class="card-content">
             <div class="card-value">{{ stats.positiveRate }}%</div>
             <div class="card-label">整体正面率</div>
-            <div class="card-trend positive">
-              <span class="trend-icon">📈</span>
-              较昨日 +{{ stats.trendChange }}%
+            <div class="card-trend positive status-tag">
+              <span class="trend-icon"> 较昨日 +{{ stats.trendChange }}%</span>
             </div>
           </div>
         </div>
         
         <div class="overview-card card-warning" @click="openAlertMonitoringDialog">
-          <div class="card-icon">⚠️</div>
+          <div class="card-icon"><mdicon name="warning-outline-rounded" size="50" color="var(--color-warning)"/></div>
           <div class="card-content">
             <div class="card-value">{{ stats.alertCount }}</div>
             <div class="card-label">舆情预警数量</div>
-            <div class="card-trend warning">
-              <span class="trend-icon">🔔</span>
-              需立即关注
+            <div class="card-trend status-tag negative">
+              <span class="trend-icon">需立即关注</span>
             </div>
           </div>
         </div>
         
         <div class="overview-card card-environment" @click="openTopicHotnessDialog">
-          <div class="card-icon">🔥</div>
+          <div class="card-icon"><mdicon name="local-fire-department-outline-rounded" size="50" color="var(--color-danger)"/></div>
           <div class="card-content">
             <div class="card-value">{{ stats.hotTopicCount }}</div>
             <div class="card-label">热点话题数量</div>
@@ -132,7 +130,7 @@
             <template #header>
               <div class="card-header">
                 <div class="header-title">
-                  <span class="card-icon">📊</span>
+                  <mdicon name="insert-chart-outline" size="28"/>
                   <h3>情感分布分析</h3>
                 </div>
                 <div class="header-subtitle">按渠道、人群、产品线的情感分布对比</div>
@@ -146,7 +144,6 @@
               >
                 <div class="dist-info">
                   <div class="dist-range">
-                    <span class="range-icon">{{ getChannelIcon(index) }}</span>
                     <span>{{ getChannelName(item.channel) }}</span>
                   </div>
                   <div class="dist-count">{{ item.positive }}/{{ item.negative }}</div>
@@ -169,7 +166,7 @@
             <template #header>
               <div class="card-header">
                 <div class="header-title">
-                  <span class="card-icon">🌊</span>
+                  <mdicon name="area-chart" size="28" />
                   <h3>实时情感监测流</h3>
                 </div>
                 <div class="stream-controls">
@@ -210,7 +207,7 @@
             <template #header>
               <div class="card-header">
                 <div class="header-title">
-                  <span class="card-icon">📈</span>
+                  <mdicon name="grouped-bar-chart" size="28"/>
                   <h3>情感趋势分析</h3>
                 </div>
                 <div class="chart-tabs">
@@ -265,7 +262,7 @@
               <template #header>
                 <div class="card-header">
                   <div class="header-title">
-                    <span class="card-icon">🚀</span>
+                    <mdicon name="rocket-launch-outline" size="28"/>
                     <h3>营销效果速览</h3>
                     <span class="marketing-count">{{ marketingActivities.length }}</span>
                   </div>
@@ -277,11 +274,6 @@
                   :key="activity.id" 
                   :class="['marketing-item', `priority-${activity.priority}`]"
                 >
-                  <div class="marketing-icon">
-                    <span v-if="activity.priority === 'high'">🔥</span>
-                    <span v-else-if="activity.priority === 'medium'">⚡</span>
-                    <span v-else>✨</span>
-                  </div>
                   <div class="marketing-content">
                     <div class="marketing-header">
                       <span class="activity-name">{{ activity.name }}</span>
@@ -310,7 +302,7 @@
               <template #header>
                 <div class="card-header">
                   <div class="header-title">
-                    <span class="card-icon">🧠</span>
+                    <mdicon name="mindfulness-outline-rounded" size="28"/>
                     <h3>智能洞察摘要</h3>
                   </div>
                 </div>
@@ -474,23 +466,23 @@
       <div class="dialog-content">
         <h3>舆情预警详细信息</h3>
         <p>当前需要重点关注的舆情预警和潜在风险：</p>
-        <el-table :data="alerts" style="width: 100%">
+        <el-table :data="alerts">
           <el-table-column prop="id" label="ID" width="80" />
           <el-table-column prop="title" label="预警标题" width="200" />
           <el-table-column prop="type" label="类型" width="120">
             <template #default="{ row }">
-              <el-tag :type="row.type === '风险' ? 'danger' : 'warning'">{{ row.type }}</el-tag>
+              <el-tag :type="row.type === 'risk' ? 'danger' : 'warning'">{{ getActionTypeName(row.type) }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="severity" label="严重程度" width="120">
             <template #default="{ row }">
-              <el-tag :type="row.severity === '高' ? 'danger' : row.severity === '中' ? 'warning' : 'info'">{{ row.severity }}</el-tag>
+              <el-tag :type="row.severity === 'high' ? 'danger' : row.severity === 'medium' ? 'warning' : 'info'">{{ getPriorityName(row.severity) }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="date" label="发生时间" width="150" />
           <el-table-column prop="status" label="状态" width="100">
             <template #default="{ row }">
-              <el-tag :type="row.status === '待处理' ? 'warning' : 'success'">{{ row.status }}</el-tag>
+              <el-tag :type="row.status === 'pending' ? 'warning' : 'success'">{{ getAlertStatusName(row.status) }}</el-tag>
             </template>
           </el-table-column>
         </el-table>
@@ -507,14 +499,14 @@
           <el-table-column prop="mentions" label="提及次数" width="100" />
           <el-table-column prop="sentiment" label="情感倾向" width="100">
             <template #default="{ row }">
-              <el-tag :type="row.sentiment === '正面' ? 'success' : row.sentiment === '负面' ? 'danger' : 'info'">{{ row.sentiment }}</el-tag>
+              <el-tag :type="row.sentiment === 'positive' ? 'success' : row.sentiment === 'negative' ? 'danger' : 'info'">{{ getEmotionName(row.sentiment) }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="trend" label="趋势" width="100">
             <template #default="{ row }">
-              <span v-if="row.trend === '上升'" style="color: green;">📈 上升</span>
-              <span v-if="row.trend === '下降'" style="color: red;">📉 下降</span>
-              <span v-if="row.trend === '平稳'" style="color: orange;">➡️ 平稳</span>
+              <span v-if="row.trend === 'rising'" style="color: green;">上升</span>
+              <span v-if="row.trend === 'falling'" style="color: red;">下降</span>
+              <span v-if="row.trend === 'stable'" style="color: orange;">平稳</span>
             </template>
           </el-table-column>
         </el-table>
@@ -545,7 +537,8 @@ import {
   getActionTypeName,
   getPriorityName,
   getIntensityName,
-  getInsightTypeName
+  getInsightTypeName,
+  getAlertStatusName
 } from '../utils/enum-mapping'
 import {
   formatDate
@@ -757,7 +750,7 @@ const getChannelIcon = (index) => {
 }
 
 const getEmotionColor = (index) => {
-  const colors = ['#52c41a', '#73d13d', '#ffd666', '#ff7875']
+  const colors = ['var(--color-primary)', 'var(--color-success)', 'var(--color-error)', 'var(--color-warning)']
   return colors[index] || '#52c41a'
 }
 
@@ -875,7 +868,7 @@ const fetchData = async () => {
     trendInsights.value = batchData.trendInsights
     alerts.value = batchData.alerts
     topics.value = batchData.topics
-
+    console.log("alert:",alerts.value);
     console.log('数据加载成功')
   } catch (err) {
     console.error('数据加载失败:', err)
@@ -1416,7 +1409,7 @@ onMounted(async () => {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #1890ff, #36cfc9);
+  background: linear-gradient(90deg, var(--color-primary-hover), #36cfc9);
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
@@ -1924,7 +1917,7 @@ onMounted(async () => {
 }
 
 .chart-tab.active {
-  background: #1890ff;
+  background: var(--color-primary-dark);
   color: white;
 }
 
@@ -1970,10 +1963,10 @@ onMounted(async () => {
 }
 
 .header-title .marketing-count {
-  background: #ff4d4f;
+  background: var(--color-error);
   color: white;
   font-size: 12px;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 10px;
   margin-left: 10px;
   font-weight: bold;
@@ -2000,15 +1993,15 @@ onMounted(async () => {
 }
 
 .marketing-item.priority-high {
-  border-left: 4px solid #ff4d4f;
+  border-left: 4px solid var(--color-danger);
 }
 
 .marketing-item.priority-medium {
-  border-left: 4px solid #faad14;
+  border-left: 4px solid var(--color-warning);
 }
 
 .marketing-item.priority-low {
-  border-left: 4px solid #52c41a;
+  border-left: 4px solid var(--color-info);
 }
 
 .marketing-icon {
@@ -2042,19 +2035,23 @@ onMounted(async () => {
   font-weight: 500;
 }
 
-.badge-优秀 {
-  background: rgba(82, 196, 26, 0.1);
-  color: #52c41a;
+.badge-excellent {
+  background: var(--color-success-hover);
+  color: white;
 }
 
-.badge-良好 {
-  background: rgba(115, 209, 61, 0.1);
-  color: #73d13d;
+.badge-good {
+  background: var(--color-primary-hover);
+  color: #fff;
 }
 
-.badge-一般 {
-  background: rgba(250, 173, 20, 0.1);
-  color: #faad14;
+.badge-average {
+  background: var(--color-warning-hover);
+  color: #fff;
+}
+.badge-poor {
+  background: var(--color-danger-hover);
+  color: #fff;
 }
 
 .marketing-details {
@@ -2084,6 +2081,7 @@ onMounted(async () => {
 .marketing-time {
   font-size: 12px;
   color: #999;
+  justify-self: end;
 }
 
 .insight-content {
@@ -2113,7 +2111,7 @@ onMounted(async () => {
 }
 
 .insight-type {
-  background: #1890ff;
+  background: var(--color-primary-dark);
   color: white;
   font-size: 12px;
   padding: 2px 8px;
@@ -2248,45 +2246,6 @@ onMounted(async () => {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* 键盘焦点样式优化 */
-*:focus-visible {
-  outline: 3px solid #1890ff;
-  outline-offset: 2px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-/* 按钮焦点样式 */
-button:focus-visible,
-.el-button:focus-visible,
-.el-select:focus-visible,
-.el-input:focus-visible {
-  outline: 3px solid #1890ff;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* 卡片焦点样式 */
-.overview-card:focus-visible,
-.data-card:focus-visible {
-  outline: 3px solid #1890ff;
-  outline-offset: 4px;
-  border-radius: 12px;
-}
-
-/* 确保所有交互元素都有焦点样式 */
-[tabindex]:focus-visible {
-  outline: 3px solid #1890ff;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* 禁用状态的无障碍样式 */
-[disabled]:focus-visible {
-  outline: 2px solid #d9d9d9;
-  outline-offset: 1px;
 }
 
 /* 确保颜色对比度符合无障碍标准 */
