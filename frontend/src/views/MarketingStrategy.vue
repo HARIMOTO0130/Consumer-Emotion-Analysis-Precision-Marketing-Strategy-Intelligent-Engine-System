@@ -281,26 +281,26 @@
             <div class="activity-list-section">
               <h3>营销活动列表</h3>
               <el-table :data="marketingActivities" style="width: 100%">
-                <el-table-column prop="name" label="活动名称" width="200" />
-                <el-table-column prop="type" label="活动类型" width="150">
+                <el-table-column prop="name" label="活动名称"   />
+                <el-table-column prop="type" label="活动类型"  >
                   <template #default="{ row }">
                     <el-tag :type="getTypeColor(row.type)">
                       {{ getTypeName(row.type) }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="startTime" label="开始时间" width="180" />
-                <el-table-column prop="endTime" label="结束时间" width="180" />
-                <el-table-column prop="status" label="状态" width="100">
+                <el-table-column prop="startTime" label="开始时间"   />
+                <el-table-column prop="endTime" label="结束时间"   />
+                <el-table-column prop="status" label="状态"  >
                   <template #default="{ row }">
                     <el-tag :type="getStatusColor(row.status)">
                       {{ row.status }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="budget" label="预算" width="120" />
-                <el-table-column prop="participants" label="参与人数" width="100" />
-                <el-table-column label="操作" width="200">
+                <el-table-column prop="budget" label="预算"   />
+                <el-table-column prop="participants" label="参与人数"   />
+                <el-table-column label="操作"  >
                   <template #default="{ row }">
                     <el-button 
                       size="small" 
@@ -441,9 +441,9 @@
               <div class="audience-analysis">
                 <h4>受众分析</h4>
                 <el-table :data="audienceAnalysis" style="width: 100%">
-                  <el-table-column prop="segment" label="用户群体" width="150" />
-                  <el-table-column prop="count" label="参与人数" width="120" />
-                  <el-table-column prop="engagement" label="参与度" width="120">
+                  <el-table-column prop="segment" label="用户群体"/>
+                  <el-table-column prop="count" label="参与人数"/>
+                  <el-table-column prop="engagement" label="参与度">
                     <template #default="{ row }">
                       <div class="progress-bar">
                         <div class="progress-fill" :style="{ width: row.engagement + '%' }"></div>
@@ -451,7 +451,7 @@
                       </div>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="conversion" label="转化率" width="120">
+                  <el-table-column prop="conversion" label="转化率">
                     <template #default="{ row }">
                       <div class="progress-bar">
                         <div class="progress-fill" :style="{ width: row.conversion + '%' }"></div>
@@ -459,7 +459,7 @@
                       </div>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="revenue" label="贡献收入" width="150" />
+                  <el-table-column prop="revenue" label="贡献收入"/>
                 </el-table>
               </div>
             </div>

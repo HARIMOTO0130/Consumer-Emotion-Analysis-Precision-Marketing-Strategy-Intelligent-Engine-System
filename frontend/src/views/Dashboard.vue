@@ -357,25 +357,25 @@
         <p>以下是最新的消费者评论和社交媒体提及，按时间倒序排列。每条评论都经过情感分析算法处理，标注了情感倾向和强度。</p>
         <div class="comment-table">
           <el-table :data="detailedComments" style="width: 100%">
-            <el-table-column prop="text" label="评论内容" width="300" />
-            <el-table-column prop="source" label="来源" width="120">
+            <el-table-column prop="text" label="评论内容"   />
+            <el-table-column prop="source" label="来源"  >
               <template #default="{ row }">
                   {{getChannelName(row.source)}}
               </template>
             </el-table-column>
-            <el-table-column prop="sentiment" label="情感倾向" width="100">
+            <el-table-column prop="sentiment" label="情感倾向"  >
               <template #default="{ row }">
                 <el-tag :type="row.sentiment === 'positive' ? 'success' : row.sentiment === 'negative' ? 'danger' : 'info'">
                   {{ getEmotionName(row.sentiment) }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="intensity" label="情感强度" width="100">
+            <el-table-column prop="intensity" label="情感强度"  >
               <template #default="{ row }">
                   {{getIntensityName(row.intensity)}}
               </template>
             </el-table-column>
-            <el-table-column prop="timestamp" label="时间" width="150" >
+            <el-table-column prop="timestamp" label="时间"   >
               <template #default="{row}">
                 {{formatDate(row.timestamp, "yyyy-mm-dd hh:mm:ss")}}
               </template>
@@ -467,20 +467,20 @@
         <h3>舆情预警详细信息</h3>
         <p>当前需要重点关注的舆情预警和潜在风险：</p>
         <el-table :data="alerts">
-          <el-table-column prop="id" label="ID" width="80" />
-          <el-table-column prop="title" label="预警标题" width="200" />
-          <el-table-column prop="type" label="类型" width="120">
+          <el-table-column prop="id" label="ID"   />
+          <el-table-column prop="title" label="预警标题"   />
+          <el-table-column prop="type" label="类型"  >
             <template #default="{ row }">
               <el-tag :type="row.type === 'risk' ? 'danger' : 'warning'">{{ getActionTypeName(row.type) }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="severity" label="严重程度" width="120">
+          <el-table-column prop="severity" label="严重程度"  >
             <template #default="{ row }">
               <el-tag :type="row.severity === 'high' ? 'danger' : row.severity === 'medium' ? 'warning' : 'info'">{{ getPriorityName(row.severity) }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="date" label="发生时间" width="150" />
-          <el-table-column prop="status" label="状态" width="100">
+          <el-table-column prop="date" label="发生时间"   />
+          <el-table-column prop="status" label="状态"  >
             <template #default="{ row }">
               <el-tag :type="row.status === 'pending' ? 'warning' : 'success'">{{ getAlertStatusName(row.status) }}</el-tag>
             </template>
@@ -494,15 +494,15 @@
         <h3>热点话题详细分析</h3>
         <p>当前最受关注的话题及其情感倾向分析：</p>
         <el-table :data="topics" style="width: 100%">
-          <el-table-column prop="rank" label="排名" width="80" />
+          <el-table-column prop="rank" label="排名"   />
           <el-table-column prop="name" label="话题名称" />
-          <el-table-column prop="mentions" label="提及次数" width="100" />
-          <el-table-column prop="sentiment" label="情感倾向" width="100">
+          <el-table-column prop="mentions" label="提及次数"   />
+          <el-table-column prop="sentiment" label="情感倾向"  >
             <template #default="{ row }">
               <el-tag :type="row.sentiment === 'positive' ? 'success' : row.sentiment === 'negative' ? 'danger' : 'info'">{{ getEmotionName(row.sentiment) }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="trend" label="趋势" width="100">
+          <el-table-column prop="trend" label="趋势"  >
             <template #default="{ row }">
               <span v-if="row.trend === 'rising'" style="color: green;">上升</span>
               <span v-if="row.trend === 'falling'" style="color: red;">下降</span>

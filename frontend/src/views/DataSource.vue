@@ -86,19 +86,19 @@
             <div class="connected-sources-section">
               <h3>已连接数据源</h3>
               <el-table :data="connectedSources" style="width: 100%">
-                <el-table-column prop="name" label="数据源名称" width="180" />
-                <el-table-column prop="type_name" label="类型" width="120" />
-                <el-table-column prop="platform" label="平台" width="120" />
-                <el-table-column prop="status" label="状态" width="100">
+                <el-table-column prop="name" label="数据源名称"   />
+                <el-table-column prop="type_name" label="类型"   />
+                <el-table-column prop="platform" label="平台"   />
+                <el-table-column prop="status" label="状态"  >
                   <template #default="{ row }">
                     <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
                       {{ row.status === 'active' ? '活跃' : '已断开' }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="lastSync" label="最后同步" width="180" />
-                <el-table-column prop="dataCount" label="数据量" width="100" />
-                <el-table-column label="操作" width="200">
+                <el-table-column prop="lastSync" label="最后同步"   />
+                <el-table-column prop="dataCount" label="数据量"   />
+                <el-table-column label="操作"  >
                   <template #default="{ row }">
                     <el-button 
                       size="small" 
@@ -222,18 +222,18 @@
             <div class="monitoring-topics-section">
               <h3>监测主题列表</h3>
               <el-table :data="monitoringTopics" style="width: 100%">
-                <el-table-column prop="subject" label="监测主题" width="200" />
-                <el-table-column prop="targetTypeName" label="监测对象" width="120" />
-                <el-table-column prop="status" label="状态" width="100">
+                <el-table-column prop="subject" label="监测主题"   />
+                <el-table-column prop="targetTypeName" label="监测对象"   />
+                <el-table-column prop="status" label="状态"  >
                   <template #default="{ row }">
                     <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
                       {{ row.status === 'active' ? '监测中' : '已停止' }}
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="startTime" label="开始时间" width="180" />
-                <el-table-column prop="dataCount" label="数据量" width="100" />
-                <el-table-column label="操作" width="200">
+                <el-table-column prop="startTime" label="开始时间"   />
+                <el-table-column prop="dataCount" label="数据量"   />
+                <el-table-column label="操作"  >
                   <template #default="{ row }">
                     <el-button 
                       size="small" 
@@ -317,17 +317,17 @@
               <div class="quality-issues">
                 <h3>数据质量问题</h3>
                 <el-table :data="qualityIssues" style="width: 100%">
-                  <el-table-column prop="type" label="问题类型" width="120" />
+                  <el-table-column prop="type" label="问题类型"   />
                   <el-table-column prop="description" label="问题描述" />
-                  <el-table-column prop="severity" label="严重程度" width="100">
+                  <el-table-column prop="severity" label="严重程度"  >
                     <template #default="{ row }">
                       <el-tag :type="row.severity === '高' ? 'danger' : row.severity === '中' ? 'warning' : 'info'">
                         {{ row.severity }}
                       </el-tag>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="count" label="数量" width="80" />
-                  <el-table-column prop="status" label="状态" width="100">
+                  <el-table-column prop="count" label="数量"   />
+                  <el-table-column prop="status" label="状态"  >
                     <template #default="{ row }">
                       <el-tag :type="row.status === '已处理' ? 'success' : row.status === '处理中' ? 'warning' : 'danger'">
                         {{ row.status }}
@@ -386,24 +386,24 @@
               <div class="topic-clusters">
                 <h3>热点话题聚类</h3>
                 <el-table :data="topicClusters" style="width: 100%">
-                  <el-table-column prop="rank" label="排名" width="80" />
-                  <el-table-column prop="name" label="话题名称" width="200" />
-                  <el-table-column prop="mentionCount" label="提及次数" width="120" />
-                  <el-table-column prop="sentiment" label="情感倾向" width="100">
+                  <el-table-column prop="rank" label="排名"   />
+                  <el-table-column prop="name" label="话题名称"   />
+                  <el-table-column prop="mentionCount" label="提及次数"   />
+                  <el-table-column prop="sentiment" label="情感倾向"  >
                     <template #default="{ row }">
                       <el-tag :type="row.sentiment === '正面' ? 'success' : row.sentiment === '负面' ? 'danger' : 'info'">
                         {{ row.sentiment }}
                       </el-tag>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="trend" label="趋势" width="100">
+                  <el-table-column prop="trend" label="趋势"  >
                     <template #default="{ row }">
                       <span :style="{ color: row.trend === '上升' ? 'green' : row.trend === '下降' ? 'red' : 'orange' }">
                         {{ row.trend === '上升' ? '上升' : row.trend === '下降' ? '下降' : '平稳' }}
                       </span>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="duration" label="持续时间" width="120" />
+                  <el-table-column prop="duration" label="持续时间"   />
                 </el-table>
               </div>
             </div>
