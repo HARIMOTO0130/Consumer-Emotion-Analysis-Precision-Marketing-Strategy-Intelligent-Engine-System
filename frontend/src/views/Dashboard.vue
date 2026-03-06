@@ -346,7 +346,9 @@
         </ul>
         <div class="chart-placeholder">
           <p>情感变化趋势图</p>
-          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=" alt="情感变化趋势图" style="width: 100%; height: 300px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;" />
+          <div class="chart-wrapper" style="height: 400px;">
+           <v-chart :option="overviewTrendOption" autoresize />
+          </div>
         </div>
       </div>
     </el-dialog>
@@ -393,43 +395,48 @@
           <el-tab-pane label="按渠道分布">
             <div class="chart-placeholder">
               <p>渠道情感分布对比图</p>
-              <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=" alt="渠道情感分布图" style="width: 100%; height: 300px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;" />
+              <div class="chart-wrapper" style="height: 400px;">
+          <v-chart :option="channelDistOption" autoresize />
+        </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="按人群分布">
             <div class="chart-placeholder">
               <p>人群情感分布对比图</p>
-              <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=" alt="人群情感分布图" style="width: 100%; height: 300px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;" />
+              <div class="chart-wrapper" style="height: 400px;">
+          <v-chart :option="userGroupDistOption" autoresize />
+        </div>
             </div>
           </el-tab-pane>
           <el-tab-pane label="按产品线分布">
             <div class="chart-placeholder">
               <p>产品线情感分布对比图</p>
-              <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=" alt="产品线情感分布图" style="width: 100%; height: 300px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;" />
+              <v-chart :option="productLineDistOption" autoresize />
             </div>
           </el-tab-pane>
         </el-tabs>
       </div>
     </el-dialog>
     
-    <el-dialog v-model="marketingEffectDialogVisible" title="营销效果详情" width="80%" :before-close="closeDialog">
-      <div class="dialog-content">
-        <h3>营销活动效果详细分析</h3>
-        <p>近期开展的营销活动效果评估及情感影响分析：</p>
-        <div class="activity-detail" v-for="activity in marketingActivities" :key="activity.id" style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
-          <h4>{{ activity.name }}</h4>
-          <p>活动时间：{{ formatDate(activity.date, "yyyy-mm-dd") }}</p>
-          <p>参与人数：{{ activity.participants }}</p>
-          <p>情感影响度：{{ getEffectName(activity.effect) }}</p>
-          <p>参与度：{{ activity.engagement }}%</p>
-          <p>转化率：{{ activity.conversion }}%</p>
-          <div class="chart-placeholder">
-            <p>活动期间情感变化趋势</p>
-            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=" alt="活动情感趋势图" style="width: 100%; height: 200px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;" />
-          </div>
+  <el-dialog v-model="marketingEffectDialogVisible" title="营销效果详情" width="80%" :before-close="closeDialog">
+    <div class="dialog-content">
+      <h3>营销活动效果详细分析</h3>
+      <p>近期开展的营销活动效果评估及情感影响分析：</p>
+      <div class="activity-detail" v-for="activity in marketingActivities" :key="activity.id" style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+        <h4>{{ activity.name }}</h4>
+        <div class="activity-info-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+          <p><strong>活动时间：</strong>{{ formatDate(activity.date, "yyyy-mm-dd") }}</p>
+          <p><strong>参与人数：</strong>{{ activity.participants }}</p>
+          <p><strong>情感影响度：</strong>{{ getEffectName(activity.effect) }}</p>
+          <p><strong>参与度：</strong>{{ activity.engagement }}%</p>
+          <p><strong>转化率：</strong>{{ activity.conversion }}%</p>
         </div>
+        
+        <div class="activity-chart-container" style="height: 250px; width: 100%; background: #fafafa; padding: 10px; border-radius: 8px;">
+          <v-chart :option="getActivityTrendOption(activity)" autoresize /> </div>
       </div>
-    </el-dialog>
+    </div>
+  </el-dialog>
     
     <el-dialog v-model="insightSummaryDialogVisible" title="智能洞察摘要详情" width="80%" :before-close="closeDialog">
       <div class="dialog-content">
@@ -451,7 +458,9 @@
         <p>长期和短期情感趋势分析，识别情感变化的关键节点和影响因素：</p>
         <div class="chart-placeholder">
           <p>长期情感趋势图（30天）</p>
-          <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48L3N2Zz4=" alt="长期情感趋势图" style="width: 100%; height: 300px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;" />
+          <div class="chart-wrapper" style="height: 450px;">
+      <v-chart :option="longTermTrendOption" autoresize />
+    </div>
         </div>
         <div class="trend-insights">
           <h4>趋势洞察</h4>
@@ -695,6 +704,144 @@ const topics = ref([
   { rank: 4, name: '物流配送', mentions: 654, sentiment: '负面', trend: '上升' },
   { rank: 5, name: '品牌活动', mentions: 543, sentiment: '正面', trend: '平稳' }
 ])
+
+const overviewTrendOption = computed(() => ({
+  tooltip: { trigger: 'axis' },
+  legend: { data: ['正面指数', '负面指数'] },
+  xAxis: { type: 'category', data: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'] },
+  yAxis: { type: 'value' },
+  series: [
+    { name: '正面指数', type: 'line', smooth: true, data: [65, 70, 68, 85, 90, 88], itemStyle: { color: '#67C23A' } },
+    { name: '负面指数', type: 'line', smooth: true, data: [15, 12, 18, 10, 8, 5], itemStyle: { color: '#F56C6C' } }
+  ]
+}));
+
+// 2. 渠道分布：堆叠柱状图
+const channelDistOption = computed(() => ({
+  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+  legend: { data: ['正面', '中性', '负面'] },
+  xAxis: { type: 'category', data: ['小红书', '抖音', '微博', '京东', '天猫'] },
+  yAxis: { type: 'value' },
+  series: [
+    { name: '正面', type: 'bar', stack: 'total', data: [320, 302, 301, 334, 390], itemStyle: { color: '#67C23A' } },
+    { name: '中性', type: 'bar', stack: 'total', data: [120, 132, 101, 134, 90], itemStyle: { color: '#909399' } },
+    { name: '负面', type: 'bar', stack: 'total', data: [20, 32, 91, 34, 10], itemStyle: { color: '#F56C6C' } }
+  ]
+}));
+
+// 3. 人群分布：南丁格尔玫瑰图
+const userGroupDistOption = computed(() => ({
+  tooltip: { trigger: 'item' },
+  series: [{
+    type: 'pie',
+    radius: [20, 140],
+    roseType: 'area',
+    itemStyle: { borderRadius: 5 },
+    data: [
+      { value: 40, name: 'Z世代' },
+      { value: 33, name: '都市白领' },
+      { value: 28, name: '精致妈妈' },
+      { value: 22, name: '小镇青年' },
+      { value: 18, name: '资深中产' }
+    ]
+  }]
+}));
+
+// 4. 30天长期趋势：面积图
+const longTermTrendOption = computed(() => ({
+  grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+  xAxis: { type: 'category', boundaryGap: false, data: Array.from({length: 30}, (_, i) => `${i+1}日`) },
+  yAxis: { type: 'value' },
+  series: [{
+    name: '舆情热度',
+    type: 'line',
+    areaStyle: {
+      color: {
+        type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+        colorStops: [{ offset: 0, color: 'rgba(64, 158, 255, 0.5)' }, { offset: 1, color: 'rgba(64, 158, 255, 0)' }]
+      }
+    },
+    data: [/* 30个随机数值 */ 120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 180, 250]
+  }]
+}));
+
+const generateTrendData = (base, type, seed) => {
+  const points = 7;
+  const data = [];
+  for (let i = 0; i < points; i++) {
+    // 使用 seed 和索引 i 制造差异，并结合 type（正面/负面）决定走向
+    const randomOffset = Math.sin(seed + i) * 10; 
+    let value;
+    if (type === 'positive') {
+      value = base + (i * 5) + randomOffset; // 总体上升
+    } else if (type === 'negative') {
+      value = base - (i * 3) + randomOffset; // 总体下降
+    } else {
+      value = base + randomOffset; // 平稳波动
+    }
+    data.push(Math.max(0, Math.round(value))); // 确保不为负数
+  }
+  return data;
+};
+
+const getActivityTrendOption = (activity) => {
+  // 1. 颜色差异化
+  const themeColor = activity.effect === 'positive' ? '#67C23A' : (activity.effect === 'negative' ? '#F56C6C' : '#409EFF');
+
+  // 2. 数据差异化：利用参与度作为基数，id作为随机种子，effect作为趋势导向
+  const uniqueData = generateTrendData(
+    activity.engagement || 50, 
+    activity.effect, 
+    activity.id
+  );
+
+  return {
+    title: {
+      text: `${activity.name} - 情感趋势走势`,
+      textStyle: { fontSize: 13, color: '#606266', fontWeight: '500' },
+      left: '0'
+    },
+    tooltip: { 
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      borderWidth: 1,
+      borderColor: themeColor
+    },
+    grid: { left: '30', right: '10', top: '50', bottom: '20', containLabel: true },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: ['阶段1', '阶段2', '阶段3', '阶段4', '阶段5', '阶段6', '阶段7'],
+      axisTick: { show: false },
+      axisLine: { lineStyle: { color: '#DCDFE6' } }
+    },
+    yAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { type: 'dashed', color: '#EBEEF5' } }
+    },
+    series: [
+      {
+        name: '影响指数',
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
+        data: uniqueData, // 这里的每一行数据现在都是唯一的
+        itemStyle: { color: themeColor },
+        areaStyle: {
+          color: {
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: `${themeColor}60` },
+              { offset: 1, color: `${themeColor}00` }
+            ]
+          }
+        },
+        lineStyle: { width: 3 }
+      }
+    ]
+  };
+};
 
 // 计算属性
 const filteredAlerts = computed(() => {

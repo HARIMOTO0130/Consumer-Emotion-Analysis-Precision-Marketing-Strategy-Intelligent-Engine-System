@@ -4,6 +4,7 @@ import Dashboard from '../views/Dashboard.vue'
 import DataSource from '../views/DataSource.vue'
 import MarketingStrategy from '../views/MarketingStrategy.vue'
 import Login from '../views/Auth/Login.vue'
+import MarketingCenter from '../views/market/MarketingCenter.vue'
 
 const routes = [
   {
@@ -27,7 +28,7 @@ const routes = [
   {
     path: '/marketing-strategy',
     name: 'MarketingStrategy',
-    component: MarketingStrategy,
+    component:  MarketingCenter,
     meta: { requiresAuth: true }
   },
   // 404页面

@@ -472,7 +472,7 @@ const connectedSources = ref([
     description: '关键词监控'
   },
   {
-    id: 2,
+    id: 3,
     name: '小红书',
     type: 'social_media',
     type_name: '社交平台',
