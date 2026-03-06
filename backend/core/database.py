@@ -97,7 +97,7 @@ async def insert_mock_data():
             await database.execute(comments_table.insert().values(
                 text=item.get("text"),
                 source=item.get("source"),
-                time=item.get("timestamp", "10:00")[-5:],
+                time=item["timestamp"],
                 emotion=item.get("sentiment"),
                 sentiment=item.get("sentiment"),
                 intensity=item.get("intensity"),
@@ -113,7 +113,7 @@ async def insert_mock_data():
                     emotion=item["emotion"],
                     sentiment=item["emotion"],
                     intensity="medium",
-                    timestamp=f"2023-12-01 {item['time']}:00"
+                    timestamp=item['time'],
                 ))
 
     if not row_exists(marketing_activities_table):

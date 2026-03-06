@@ -43,28 +43,28 @@ DEFAULT_RECENT_COMMENTS = [
         "id": 1,
         "text": "1.空心菜正常，味道偏咸 2.金钱蛋水dangdang的，没有焦香急于出餐 3.辣椒炒肉基本上没动，实在是太咸了，生抽跟盐不要钱似的，吃完后口腔里头仍有咸味一直回味😡 4.那么多就餐人员只有一个服务员，已经很厉害了 午饭期间人多，自助下单后40分钟才开始上菜但出品真的很难吃。 不会再吃了。", 
         "source": 'xiaohongshu', 
-        "time": '2025-11-21 13:01:00', 
+        "time": '2025-11-21 00:00:00', 
         "emotion": 'negative'
     },  # source:weibo(微博);emotion:positive(正面)
     {
         "id": 2,
         "text": "物流有点慢，但是产品还不错",
         "source": 'douyin',
-        "time": '2025-12-03 19:20:00',
+        "time": '2025-12-03 00:00:00',
         "emotion": 'neutral'
     },       # source:taobao(淘宝);emotion:neutral(中性)
     {
         "id": 3,
         "text": "抱吃，还不如吃食堂小炒 味道不跟对面小酒馆比，差对面一大截。死咸，色香味一个不占",
         "source": 'meituan',
-        "time": '2025-12-10 14:43:00',
+        "time": '2025-12-10 00:00:00',
         "emotion": 'negative'
     },           # emotion:negative(负面)
     {
         "id": 4,
         "text": "爬完山，小朋友要吃拔丝香蕉，特意过来，但是老板说这个菜太费时间了，所以旺季不做，淡季才有。点了其他的菜，都比较下饭，性价比不错。",
         "source": 'meituan',
-        "time": '2025-12-10 15:21:00',
+        "time": '2025-12-10 00:00:00',
         "emotion": 'positive'
     },     # source:xiaohongshu(小红书);emotion:positive(正面)
     {
@@ -83,14 +83,14 @@ DEFAULT_DETAILED_COMMENTS = [
         "source": 'xiaohongshu',
         "sentiment": 'positive',
         "intensity": 'strong',
-        "timestamp": '2025-10-21 10:25:00'
+        "timestamp": '2025-10-21 00:00:00'
     },  # source:weibo(微博);sentiment:positive(正面);intensity:strong(强)
     {
         "text": "在珠海点到一家好吃的湘菜\n这个小炒牛肉太香了\n干完一整碗饭 撑 ​",
         "source": 'meituan',
         "sentiment": 'positive',
         "intensity": 'medium',
-        "timestamp": '2025-11-11 10:22:00'
+        "timestamp": '2025-11-11 00:00:00'
     },       # source:taobao(淘宝);sentiment:neutral(中性);intensity:medium(中)
     {
         "text": "“菜品新鲜”“味道不错”“经济实惠”“包装严实”#（套餐）紫苏炒牛蛙+五常香米饭+赠品三选一#好吃 分量足 服务态度好，性价比高，推荐👍",

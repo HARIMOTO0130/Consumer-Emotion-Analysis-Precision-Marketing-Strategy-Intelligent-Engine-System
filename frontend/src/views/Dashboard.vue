@@ -192,7 +192,7 @@
                   <div class="stream-text">{{ item.text }}</div>
                   <div class="stream-meta">
                     <span class="stream-source">{{ getChannelName(item.source) }}</span>
-                    <span class="stream-time">{{ item.time }}</span>
+                    <span class="stream-time">{{ formatDate(item.time,"yyyy-mm") }}</span>
                   </div>
                 </div>
               </div>
@@ -868,7 +868,8 @@ const fetchData = async () => {
     trendInsights.value = batchData.trendInsights
     alerts.value = batchData.alerts
     topics.value = batchData.topics
-    console.log("alert:",alerts.value);
+    console.log("batchData:",batchData);
+    console.log("insight Data: ", batchData.insights);
     console.log('数据加载成功')
   } catch (err) {
     console.error('数据加载失败:', err)
@@ -1079,23 +1080,6 @@ onMounted(async () => {
   console.log('情感分析仪表盘组件已挂载')
   // 初始加载数据
   await fetchData()
-  // 定时更新实时流
-  setInterval(() => {
-    if (!streamPaused.value) {
-      // 更新最新评论
-      const newComment = {
-        id: Date.now(),
-        text: `新的实时评论 - ${Date.now()}`,
-        source: '实时数据',
-        time: new Date().toLocaleTimeString(),
-        emotion: ['positive', 'neutral', 'negative'][Math.floor(Math.random() * 3)]
-      }
-      recentComments.value.unshift(newComment)
-      if (recentComments.value.length > 10) {
-        recentComments.value.pop()
-      }
-    }
-  }, 5000)
 })
 </script>
 
@@ -1716,6 +1700,7 @@ onMounted(async () => {
   color: #2c3e50;
   margin-bottom: 8px;
   line-height: 1.4;
+  text-align: start;
 }
 
 .stream-meta {
