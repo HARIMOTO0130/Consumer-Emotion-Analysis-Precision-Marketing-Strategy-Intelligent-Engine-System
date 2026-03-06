@@ -1,10 +1,6 @@
 <template>
   <div class="marketing-strategy-container">
-    <!-- 页面标题 -->
-    <div class="page-header">
-      <h1>营销中心</h1>
-      <p class="subtitle">一站式营销策略管理与分析</p>
-    </div>
+
 
     <!-- 功能标签页 -->
     <div class="tabs-container">

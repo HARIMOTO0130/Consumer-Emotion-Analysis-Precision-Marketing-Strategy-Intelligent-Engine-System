@@ -5,6 +5,8 @@ import DataSource from '../views/DataSource.vue'
 import MarketingStrategy from '../views/MarketingStrategy.vue'
 import Login from '../views/Auth/Login.vue'
 import MarketingCenter from '../views/market/MarketingCenter.vue'
+import aiChat from '../components/AIChat/ai-chat.vue'
+
 
 const routes = [
   {
@@ -29,6 +31,12 @@ const routes = [
     path: '/marketing-strategy',
     name: 'MarketingStrategy',
     component:  MarketingCenter,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/test-ai',
+    name: 'ai',
+    component:  aiChat,
     meta: { requiresAuth: true }
   },
   // 404页面

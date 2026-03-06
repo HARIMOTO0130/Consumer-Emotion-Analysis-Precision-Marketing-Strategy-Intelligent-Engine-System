@@ -11,10 +11,17 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AiCart: typeof import('./src/components/AIChat/ai-cart.vue')['default']
+    AiChat: typeof import('./src/components/AIChat/ai-chat.vue')['default']
     IMaterialSymbolsMenu: typeof import('~icons/material-symbols/menu.vue')['default']
     Mdicon: typeof import('./src/components/mdicon.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TAvatar: typeof import('tdesign-vue-next')['Avatar']
+    TButton: typeof import('tdesign-vue-next')['Button']
+    TComment: typeof import('tdesign-vue-next')['Comment']
+    TLoading: typeof import('tdesign-vue-next')['Loading']
+    TTextarea: typeof import('tdesign-vue-next')['Textarea']
   }
 }
