@@ -50,13 +50,18 @@ export default defineConfig({
     }
   },
   // 实际部署时删除
-  server: {
-    proxy: {
-      '/chat-api': {
-        target: process.env.VITE_CHAT_SERVER_API_URL,
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/chat-api/, '')
-      }
-    }
+server: {
+  proxy: {
+    '/chat-api': {
+      target: "http://26.146.41.194:4367",
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/chat-api/, '')
+    },
+    '/mcp-api': {
+      target: "http://localhost:8000",
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/mcp-api/, '/v1/api')
+    },
   }
+}
 })

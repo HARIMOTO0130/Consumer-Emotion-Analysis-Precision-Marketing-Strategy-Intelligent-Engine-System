@@ -5,6 +5,7 @@ import sqlalchemy
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from core.base import metadata
+import sys
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -190,6 +191,14 @@ async def lifespan(app: FastAPI):
 
 def init_app():
     """初始化 FastAPI 应用"""
+
+    if sys.platform == 'win32':
+            try:
+                from asyncio import WindowsProactorEventLoopPolicy
+                asyncio.set_event_loop_policy(WindowsProactorEventLoopPolicy())
+            except Exception:
+                pass
+
     from fastapi.middleware.cors import CORSMiddleware
     app = FastAPI(
         title="Consumer Emotion Analysis API",

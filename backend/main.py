@@ -2,6 +2,8 @@ import asyncio
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import sys
+from core.mcp_bridge import bing_mcp
 
 # 导入修改后的数据库初始化函数
 from core.database import init_app
@@ -21,6 +23,9 @@ from modules.trend_insights import router as trend_router
 from modules.alerts import router as alerts_router
 from modules.topics import router as topics_router
 
+# MCP 路由
+from mcp_modules.bing_search.router import router as bing_router
+
 # 注册路由
 app.include_router(stats_router, prefix=URL_PREFIX)
 app.include_router(emotion_router, prefix=URL_PREFIX)
@@ -31,6 +36,8 @@ app.include_router(trend_router, prefix=URL_PREFIX)
 app.include_router(alerts_router, prefix=URL_PREFIX)
 app.include_router(topics_router, prefix=URL_PREFIX)
 
+# MCP 路由
+app.include_router(bing_router,prefix=URL_PREFIX)
 
 @app.get(URL_PREFIX + "/batch-data")
 async def get_batch_data():

@@ -21,6 +21,7 @@ declare module 'vue' {
     TAvatar: typeof import('tdesign-vue-next')['Avatar']
     TButton: typeof import('tdesign-vue-next')['Button']
     TComment: typeof import('tdesign-vue-next')['Comment']
+    TIcon: typeof import('tdesign-vue-next')['Icon']
     TLoading: typeof import('tdesign-vue-next')['Loading']
     TTextarea: typeof import('tdesign-vue-next')['Textarea']
   }
