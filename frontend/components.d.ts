@@ -16,6 +16,7 @@ declare module 'vue' {
     IMaterialSymbolsMenu: typeof import('~icons/material-symbols/menu.vue')['default']
     Mdicon: typeof import('./src/components/mdicon.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
+    PosDataVisualization: typeof import('./src/components/pos-data-visualization.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TAvatar: typeof import('tdesign-vue-next')['Avatar']

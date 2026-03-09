@@ -123,7 +123,7 @@
 
       <!-- 主要数据展示区域 -->
       <div class="main-data-section">
-        <!-- 左侧：情感分布和实时流 -->
+        <!-- 左侧：情感分布、实时流和流水数据 -->
         <div class="left-panel">
           <!-- 情感分布 -->
           <el-card class="data-card" shadow="hover" @click="openEmotionDistributionDialog">
@@ -198,6 +198,52 @@
               </div>
             </div>
           </el-card>
+
+          <!-- 总体信息磁贴 -->
+          <el-card class="data-card" shadow="hover" @click="openTransactionOverviewDialog">
+            <template #header>
+              <div class="card-header">
+                <div class="header-title">
+                  <mdicon name="currency-usd" size="28"/>
+                  <h3>今日总流水</h3>
+                  <span class="transaction-count">{{ transactionStats.totalSales }}</span>
+                </div>
+              </div>
+            </template>
+            <div class="transaction-content">
+              <div class="transaction-item">
+                <span class="item-label">订单数</span>
+                <span class="item-value">{{ transactionStats.orderCount }}</span>
+              </div>
+              <div class="transaction-item">
+                <span class="item-label">客单价</span>
+                <span class="item-value">{{ transactionStats.avgOrderValue }}</span>
+              </div>
+            </div>
+          </el-card>
+          
+          <!-- 详细信息磁贴 -->
+          <el-card class="data-card" shadow="hover" @click="openTransactionDetailsDialog">
+            <template #header>
+              <div class="card-header">
+                <div class="header-title">
+                  <mdicon name="table" size="28"/>
+                  <h3>总订单数</h3>
+                  <span class="transaction-count">{{ transactionStats.totalOrders }}</span>
+                </div>
+              </div>
+            </template>
+            <div class="transaction-content">
+              <div class="transaction-item">
+                <span class="item-label">已完成</span>
+                <span class="item-value positive">{{ transactionStats.completedOrders }}</span>
+              </div>
+              <div class="transaction-item">
+                <span class="item-label">进行中</span>
+                <span class="item-value warning">{{ transactionStats.pendingOrders }}</span>
+              </div>
+            </div>
+          </el-card>
         </div>
 
         <!-- 右侧：图表和营销效果 -->
@@ -255,10 +301,10 @@
             </div>
           </el-card>
 
-          <!-- 营销效果和智能洞察 -->
+            <!-- 营销效果和智能洞察 -->
           <div class="bottom-section">
             <!-- 营销效果速览 -->
-            <el-card class="marketing-card" shadow="hover" @click="openMarketingEffectDialog">
+            <el-card class="data-card" shadow="hover" @click="openMarketingEffectDialog">
               <template #header>
                 <div class="card-header">
                   <div class="header-title">
@@ -331,6 +377,49 @@
           </div>
         </div>
       </div>
+
+      <!-- 流水数据可视化弹窗 -->
+      <el-dialog v-model="transactionOverviewDialogVisible" title="流水数据总体信息" width="80%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>流水数据总体分析</h3>
+          <p>今日总流水：{{ transactionStats.totalSales }}，订单数：{{ transactionStats.orderCount }}，客单价：{{ transactionStats.avgOrderValue }}</p>
+          <p>数据来源：湘菜品牌销售系统</p>
+          <div class="chart-placeholder">
+            <p>流水趋势图</p>
+            <div class="chart-wrapper" style="height: 400px;">
+              <v-chart :option="transactionTrendOption" autoresize />
+            </div>
+          </div>
+          <div class="chart-placeholder">
+            <p>产品销售分布</p>
+            <div class="chart-wrapper" style="height: 400px;">
+              <v-chart :option="productDistributionOption" autoresize />
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+
+      <el-dialog v-model="transactionDetailsDialogVisible" title="流水数据详细信息" width="90%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>流水数据详细分析</h3>
+          <p>总订单数：{{ transactionStats.totalOrders }}，已完成：{{ transactionStats.completedOrders }}，进行中：{{ transactionStats.pendingOrders }}</p>
+          <div class="transaction-table">
+            <el-table :data="transactionDetails" style="width: 100%">
+              <el-table-column prop="transaction_id" label="交易ID" width="120" />
+              <el-table-column prop="date" label="日期" width="100" />
+              <el-table-column prop="time" label="时间" width="100" />
+              <el-table-column prop="product_name" label="产品名称" width="150" />
+              <el-table-column prop="category" label="类别" width="100" />
+              <el-table-column prop="quantity" label="数量" width="80" />
+              <el-table-column prop="unit_price" label="单价" width="100" />
+              <el-table-column prop="total_amount" label="总金额" width="100" />
+              <el-table-column prop="payment_method" label="支付方式" width="120" />
+              <el-table-column prop="customer_type" label="客户类型" width="100" />
+              <el-table-column prop="store_location" label="门店位置" width="120" />
+            </el-table>
+          </div>
+        </div>
+      </el-dialog>
     </div>
     
     <!-- 弹窗对话框 -->
@@ -552,6 +641,7 @@ import {
 import {
   formatDate
 } from "../utils/time-format"
+import POSDataVisualization from '../components/pos-data-visualization.vue'
 
 // 注册ECharts组件
 use([
@@ -569,7 +659,8 @@ const router = useRouter()
 
 // 注册组件
 const components = {
-  VChart
+  VChart,
+  POSDataVisualization
 }
 
 // 响应式数据
@@ -586,6 +677,8 @@ const insightSummaryDialogVisible = ref(false)
 const trendAnalysisDialogVisible = ref(false)
 const alertMonitoringDialogVisible = ref(false)
 const topicHotnessDialogVisible = ref(false)
+const transactionOverviewDialogVisible = ref(false)
+const transactionDetailsDialogVisible = ref(false)
 
 // 控制实时流
 const streamPaused = ref(false)
@@ -608,6 +701,220 @@ const stats = ref({
   alertCount: 12,
   hotTopicCount: 8,
   topTopic: "新品发布"
+})
+
+// 流水数据统计
+const transactionStats = ref({
+  totalSales: '¥128,450',
+  orderCount: 156,
+  avgOrderValue: '¥823',
+  totalOrders: 1245,
+  completedOrders: 1120,
+  pendingOrders: 125
+})
+
+// 流水数据详细信息
+const transactionDetails = ref([
+  {
+    transaction_id: 'TX20231201001',
+    date: '2023-12-01',
+    time: '10:25',
+    product_name: '剁椒鱼头',
+    category: '主菜',
+    quantity: 2,
+    unit_price: 98.00,
+    total_amount: 196.00,
+    payment_method: '微信支付',
+    customer_type: '会员',
+    store_location: '市中心店'
+  },
+  {
+    transaction_id: 'TX20231201002',
+    date: '2023-12-01',
+    time: '10:30',
+    product_name: '辣椒炒肉',
+    category: '主菜',
+    quantity: 1,
+    unit_price: 48.00,
+    total_amount: 48.00,
+    payment_method: '支付宝',
+    customer_type: '散客',
+    store_location: '市中心店'
+  },
+  {
+    transaction_id: 'TX20231201003',
+    date: '2023-12-01',
+    time: '10:35',
+    product_name: '口味虾',
+    category: '特色菜',
+    quantity: 1,
+    unit_price: 88.00,
+    total_amount: 88.00,
+    payment_method: '现金',
+    customer_type: '会员',
+    store_location: '市中心店'
+  },
+  {
+    transaction_id: 'TX20231201004',
+    date: '2023-12-01',
+    time: '10:40',
+    product_name: '臭豆腐',
+    category: '小吃',
+    quantity: 3,
+    unit_price: 12.00,
+    total_amount: 36.00,
+    payment_method: '微信支付',
+    customer_type: '散客',
+    store_location: '市中心店'
+  },
+  {
+    transaction_id: 'TX20231201005',
+    date: '2023-12-01',
+    time: '10:45',
+    product_name: '糖油粑粑',
+    category: '甜品',
+    quantity: 2,
+    unit_price: 8.00,
+    total_amount: 16.00,
+    payment_method: '支付宝',
+    customer_type: '会员',
+    store_location: '市中心店'
+  }
+])
+
+// 流水趋势图表配置
+const transactionTrendOption = ref({
+  title: {
+    text: '今日流水趋势',
+    left: 'center',
+    textStyle: {
+      fontSize: 16,
+      fontWeight: 'bold'
+    }
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross'
+    }
+  },
+  legend: {
+    data: ['流水金额', '订单数量'],
+    top: '10%'
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    data: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00']
+  },
+  yAxis: [
+    {
+      type: 'value',
+      name: '流水金额(元)',
+      position: 'left',
+      axisLabel: {
+        formatter: '{value}'
+      }
+    },
+    {
+      type: 'value',
+      name: '订单数量',
+      position: 'right',
+      axisLabel: {
+        formatter: '{value}'
+      }
+    }
+  ],
+  series: [
+    {
+      name: '流水金额',
+      type: 'line',
+      smooth: true,
+      data: [12000, 18000, 25000, 22000, 28000, 35000, 28000, 15000],
+      smoothMonotone: 'x',
+      lineStyle: {
+        color: '#52c41a',
+        width: 3
+      },
+      areaStyle: {
+        color: {
+          type: 'linear',
+          x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(82, 196, 26, 0.3)' },
+            { offset: 1, color: 'rgba(82, 196, 26, 0.05)' }
+          ]
+        }
+      }
+    },
+    {
+      name: '订单数量',
+      type: 'bar',
+      yAxisIndex: 1,
+      data: [12, 18, 25, 22, 28, 35, 28, 15],
+      itemStyle: {
+        color: '#1890ff'
+      }
+    }
+  ]
+})
+
+// 产品销售分布图表配置
+const productDistributionOption = ref({
+  title: {
+    text: '产品销售分布',
+    left: 'center',
+    textStyle: {
+      fontSize: 16,
+      fontWeight: 'bold'
+    }
+  },
+  tooltip: {
+    trigger: 'item',
+    formatter: '{a} <br/>{b}: {c} ({d}%)'
+  },
+  legend: {
+    orient: 'vertical',
+    left: 'left',
+    data: ['剁椒鱼头', '辣椒炒肉', '口味虾', '臭豆腐', '糖油粑粑']
+  },
+  series: [
+    {
+      name: '销售额分布',
+      type: 'pie',
+      radius: ['40%', '70%'],
+      avoidLabelOverlap: false,
+      itemStyle: {
+        borderRadius: 10,
+        borderColor: '#fff',
+        borderWidth: 2
+      },
+      label: {
+        show: true,
+        formatter: '{b}: {d}%'
+      },
+      emphasis: {
+        label: {
+          show: true,
+          fontSize: 16,
+          fontWeight: 'bold'
+        }
+      },
+      data: [
+        { value: 35, name: '剁椒鱼头', itemStyle: { color: '#ff4d4f' } },
+        { value: 25, name: '辣椒炒肉', itemStyle: { color: '#fa8c16' } },
+        { value: 20, name: '口味虾', itemStyle: { color: '#fa541c' } },
+        { value: 12, name: '臭豆腐', itemStyle: { color: '#722ed1' } },
+        { value: 8, name: '糖油粑粑', itemStyle: { color: '#f5222d' } }
+      ]
+    }
+  ]
 })
 
 // 情感分布数据
@@ -937,6 +1244,14 @@ const openAlertMonitoringDialog = () => {
 
 const openTopicHotnessDialog = () => {
   topicHotnessDialogVisible.value = true
+}
+
+const openTransactionOverviewDialog = () => {
+  transactionOverviewDialogVisible.value = true
+}
+
+const openTransactionDetailsDialog = () => {
+  transactionDetailsDialogVisible.value = true
 }
 
 // 关闭弹窗方法
@@ -2080,7 +2395,7 @@ onMounted(async () => {
   }
 }
 
-.marketing-card,
+.data-card,
 .insight-card {
   border-radius: 12px;
   overflow: hidden;
@@ -2088,14 +2403,25 @@ onMounted(async () => {
   transition: all 0.3s ease;
 }
 
-.marketing-card:hover,
-.insight-card:hover {
+.data-card:hover,
+.insight-card:hover,
+.transaction-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .header-title .marketing-count {
   background: var(--color-error);
+  color: white;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.header-title .transaction-count {
+  background: var(--color-success);
   color: white;
   font-size: 12px;
   padding: 3px 8px;
@@ -2214,6 +2540,46 @@ onMounted(async () => {
   font-size: 12px;
   color: #999;
   justify-self: end;
+}
+
+.transaction-content {
+  padding: 0 20px 20px;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.transaction-item:hover {
+  background: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.item-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.item-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.item-value.positive {
+  color: #52c41a;
+}
+
+.item-value.warning {
+  color: #faad14;
 }
 
 .insight-content {
