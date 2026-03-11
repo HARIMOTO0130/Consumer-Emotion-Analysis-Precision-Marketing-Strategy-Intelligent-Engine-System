@@ -204,7 +204,7 @@
             <template #header>
               <div class="card-header">
                 <div class="header-title">
-                  <mdicon name="currency-usd" size="28"/>
+                  <mdicon name="attach-money" size="28"/>
                   <h3>今日总流水</h3>
                   <span class="transaction-count">{{ transactionStats.totalSales }}</span>
                 </div>
@@ -378,245 +378,320 @@
         </div>
       </div>
 
-      <!-- 流水数据可视化弹窗 -->
+      <!-- ========== 流水数据可视化弹窗 ========== -->
+      <!-- 总体信息弹窗（含筛选） -->
       <el-dialog v-model="transactionOverviewDialogVisible" title="流水数据总体信息" width="80%" :before-close="closeDialog">
         <div class="dialog-content">
+          <!-- 筛选区域 -->
+          <el-form :inline="true" :model="overviewFilters" class="filter-form">
+            <el-form-item label="日期范围">
+              <el-date-picker
+                v-model="overviewFilters.dateRange"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                format="YYYY-MM-DD"
+                value-format="YYYY-MM-DD"
+              />
+            </el-form-item>
+            <el-form-item label="门店">
+              <el-select v-model="overviewFilters.stores" multiple placeholder="全部门店" clearable>
+                <el-option v-for="store in storeOptions" :key="store" :label="store" :value="store" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="支付方式">
+              <el-select v-model="overviewFilters.paymentMethods" multiple placeholder="全部方式" clearable>
+                <el-option v-for="method in paymentMethodOptions" :key="method" :label="method" :value="method" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="applyOverviewFilters">查询</el-button>
+              <el-button @click="resetOverviewFilters">重置</el-button>
+            </el-form-item>
+          </el-form>
+
           <h3>流水数据总体分析</h3>
-          <p>今日总流水：{{ transactionStats.totalSales }}，订单数：{{ transactionStats.orderCount }}，客单价：{{ transactionStats.avgOrderValue }}</p>
+          <p>今日总流水：{{ filteredStats.totalSales }}，订单数：{{ filteredStats.orderCount }}，客单价：{{ filteredStats.avgOrderValue }}</p>
           <p>数据来源：湘菜品牌销售系统</p>
           <div class="chart-placeholder">
             <p>流水趋势图</p>
             <div class="chart-wrapper" style="height: 400px;">
-              <v-chart :option="transactionTrendOption" autoresize />
+              <v-chart :option="filteredTrendOption" autoresize />
             </div>
           </div>
           <div class="chart-placeholder">
             <p>产品销售分布</p>
             <div class="chart-wrapper" style="height: 400px;">
-              <v-chart :option="productDistributionOption" autoresize />
+              <v-chart :option="filteredProductOption" autoresize />
             </div>
           </div>
         </div>
       </el-dialog>
 
+      <!-- 详细信息弹窗（含筛选+分页） -->
       <el-dialog v-model="transactionDetailsDialogVisible" title="流水数据详细信息" width="90%" :before-close="closeDialog">
         <div class="dialog-content">
+          <!-- 筛选区域（可独立于总体） -->
+          <el-form :inline="true" :model="detailFilters" class="filter-form">
+            <el-form-item label="日期范围">
+              <el-date-picker
+                v-model="detailFilters.dateRange"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                format="YYYY-MM-DD"
+                value-format="YYYY-MM-DD"
+              />
+            </el-form-item>
+            <el-form-item label="门店">
+              <el-select v-model="detailFilters.stores" multiple placeholder="全部门店" clearable>
+                <el-option v-for="store in storeOptions" :key="store" :label="store" :value="store" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="支付方式">
+              <el-select v-model="detailFilters.paymentMethods" multiple placeholder="全部方式" clearable>
+                <el-option v-for="method in paymentMethodOptions" :key="method" :label="method" :value="method" />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="applyDetailFilters">查询</el-button>
+              <el-button @click="resetDetailFilters">重置</el-button>
+            </el-form-item>
+          </el-form>
+
           <h3>流水数据详细分析</h3>
-          <p>总订单数：{{ transactionStats.totalOrders }}，已完成：{{ transactionStats.completedOrders }}，进行中：{{ transactionStats.pendingOrders }}</p>
+          <p>总订单数：{{ filteredDetailStats.totalOrders }}，已完成：{{ filteredDetailStats.completedOrders }}，进行中：{{ filteredDetailStats.pendingOrders }}</p>
           <div class="transaction-table">
-            <el-table :data="transactionDetails" style="width: 100%">
-              <el-table-column prop="transaction_id" label="交易ID" width="120" />
-              <el-table-column prop="date" label="日期" width="100" />
-              <el-table-column prop="time" label="时间" width="100" />
-              <el-table-column prop="product_name" label="产品名称" width="150" />
-              <el-table-column prop="category" label="类别" width="100" />
-              <el-table-column prop="quantity" label="数量" width="80" />
-              <el-table-column prop="unit_price" label="单价" width="100" />
-              <el-table-column prop="total_amount" label="总金额" width="100" />
-              <el-table-column prop="payment_method" label="支付方式" width="120" />
-              <el-table-column prop="customer_type" label="客户类型" width="100" />
-              <el-table-column prop="store_location" label="门店位置" width="120" />
+            <el-table :data="paginatedDetails" style="width: 100%" border>
+              <el-table-column prop="transaction_id" label="交易ID" />
+              <el-table-column prop="date" label="日期" />
+              <el-table-column prop="time" label="时间" />
+              <el-table-column prop="product_name" label="产品名称" />
+              <el-table-column prop="category" label="类别"/>
+              <el-table-column prop="quantity" label="数量" />
+              <el-table-column prop="unit_price" label="单价" />
+              <el-table-column prop="total_amount" label="总金额" />
+              <el-table-column prop="payment_method" label="支付方式" />
+              <el-table-column prop="customer_type" label="客户类型" />
+              <el-table-column prop="store_location" label="门店位置" />
+            </el-table>
+            
+            <el-pagination
+              v-model:current-page="currentPage"
+              v-model:page-size="pageSize"
+              :page-sizes="[10, 20, 50, 100]"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="filteredDetails.length"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              style="margin-top: 20px;"
+            />
+          </div>
+        </div>
+      </el-dialog>
+
+      <!-- 其他原有弹窗（保持不变） -->
+      <el-dialog v-model="emotionOverviewDialogVisible" title="情感态势总览详情" width="80%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>情感态势总览详细分析</h3>
+          <p>本通过多维度数据分析，实时监控消费者对品牌、产品和服务的情感变化趋势。当前总体情感指数为{{ stats.positiveRate }}%，较昨日提升{{ stats.trendChange }}%。</p>
+          <p>主要发现：</p>
+          <ul>
+            <li>正面情感主要集中在产品质量和客户服务方面</li>
+            <li>负面情感主要源于价格敏感性和物流配送问题</li>
+            <li>关键话题包括新品发布、价格调整、售后服务等</li>
+          </ul>
+          <div class="chart-placeholder">
+            <p>情感变化趋势图</p>
+            <div class="chart-wrapper" style="height: 400px;">
+             <v-chart :option="overviewTrendOption" autoresize />
+            </div>
+          </div>
+        </div>
+      </el-dialog>
+      
+      <el-dialog v-model="realTimeStreamDialogVisible" title="实时情感监测流详情" width="80%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>实时情感监测流详细数据</h3>
+          <p>以下是最新的消费者评论和社交媒体提及，按时间倒序排列。每条评论都经过情感分析算法处理，标注了情感倾向和强度。</p>
+          <div class="comment-table">
+            <el-table :data="detailedComments" style="width: 100%">
+              <el-table-column prop="text" label="评论内容"   />
+              <el-table-column prop="source" label="来源"  >
+                <template #default="{ row }">
+                    {{getChannelName(row.source)}}
+                </template>
+              </el-table-column>
+              <el-table-column prop="sentiment" label="情感倾向"  >
+                <template #default="{ row }">
+                  <el-tag :type="row.sentiment === 'positive' ? 'success' : row.sentiment === 'negative' ? 'danger' : 'info'">
+                    {{ getEmotionName(row.sentiment) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="intensity" label="情感强度"  >
+                <template #default="{ row }">
+                    {{getIntensityName(row.intensity)}}
+                </template>
+              </el-table-column>
+              <el-table-column prop="timestamp" label="时间"   >
+                <template #default="{row}">
+                  {{formatDate(row.timestamp, "yyyy-mm-dd hh:mm:ss")}}
+                </template>
+              </el-table-column>
             </el-table>
           </div>
         </div>
       </el-dialog>
-    </div>
-    
-    <!-- 弹窗对话框 -->
-    <el-dialog v-model="emotionOverviewDialogVisible" title="情感态势总览详情" width="80%" :before-close="closeDialog">
-      <div class="dialog-content">
-        <h3>情感态势总览详细分析</h3>
-        <p>本通过多维度数据分析，实时监控消费者对品牌、产品和服务的情感变化趋势。当前总体情感指数为{{ stats.positiveRate }}%，较昨日提升{{ stats.trendChange }}%。</p>
-        <p>主要发现：</p>
-        <ul>
-          <li>正面情感主要集中在产品质量和客户服务方面</li>
-          <li>负面情感主要源于价格敏感性和物流配送问题</li>
-          <li>关键话题包括新品发布、价格调整、售后服务等</li>
-        </ul>
-        <div class="chart-placeholder">
-          <p>情感变化趋势图</p>
-          <div class="chart-wrapper" style="height: 400px;">
-           <v-chart :option="overviewTrendOption" autoresize />
+      
+      <el-dialog v-model="emotionDistributionDialogVisible" title="多维度情感分布详情" width="80%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>多维度情感分布详细分析</h3>
+          <p>按照不同维度分析消费者情感分布情况：</p>
+          <el-tabs>
+            <el-tab-pane label="按渠道分布">
+              <div class="chart-placeholder">
+                <p>渠道情感分布对比图</p>
+                <div class="chart-wrapper" style="height: 400px;">
+            <v-chart :option="channelDistOption" autoresize />
           </div>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="按人群分布">
+              <div class="chart-placeholder">
+                <p>人群情感分布对比图</p>
+                <div class="chart-wrapper" style="height: 400px;">
+            <v-chart :option="userGroupDistOption" autoresize />
+          </div>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="按产品线分布">
+              <div class="chart-placeholder">
+                <p>产品线情感分布对比图</p>
+                <v-chart :option="productLineDistOption" autoresize />
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+      </el-dialog>
+      
+    <el-dialog v-model="marketingEffectDialogVisible" title="营销效果详情" width="80%" :before-close="closeDialog">
+      <div class="dialog-content">
+        <h3>营销活动效果详细分析</h3>
+        <p>近期开展的营销活动效果评估及情感影响分析：</p>
+        <div class="activity-detail" v-for="activity in marketingActivities" :key="activity.id" style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
+          <h4>{{ activity.name }}</h4>
+          <div class="activity-info-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+            <p><strong>活动时间：</strong>{{ formatDate(activity.date, "yyyy-mm-dd") }}</p>
+            <p><strong>参与人数：</strong>{{ activity.participants }}</p>
+            <p><strong>情感影响度：</strong>{{ getEffectName(activity.effect) }}</p>
+            <p><strong>参与度：</strong>{{ activity.engagement }}%</p>
+            <p><strong>转化率：</strong>{{ activity.conversion }}%</p>
+          </div>
+          
+          <div class="activity-chart-container" style="height: 250px; width: 100%; background: #fafafa; padding: 10px; border-radius: 8px;">
+            <v-chart :option="getActivityTrendOption(activity)" autoresize /> </div>
         </div>
       </div>
     </el-dialog>
-    
-    <el-dialog v-model="realTimeStreamDialogVisible" title="实时情感监测流详情" width="80%" :before-close="closeDialog">
-      <div class="dialog-content">
-        <h3>实时情感监测流详细数据</h3>
-        <p>以下是最新的消费者评论和社交媒体提及，按时间倒序排列。每条评论都经过情感分析算法处理，标注了情感倾向和强度。</p>
-        <div class="comment-table">
-          <el-table :data="detailedComments" style="width: 100%">
-            <el-table-column prop="text" label="评论内容"   />
-            <el-table-column prop="source" label="来源"  >
+      
+      <el-dialog v-model="insightSummaryDialogVisible" title="智能洞察摘要详情" width="80%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>AI自动生成的消费者情感洞察</h3>
+          <p>基于大数据和AI算法，自动生成的消费者情感洞察和行动建议：</p>
+          <div class="insight-detail" v-for="insight in detailedInsights" :key="insight.id" style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px;">
+            <h4>{{ insight.title }}</h4>
+            <p>{{ insight.description }}</p>
+            <p><strong>建议行动：</strong>{{ insight.recommendation }}</p>
+            <p><strong>紧急程度：</strong>{{ getPriorityName(insight.priority) }}</p>
+            <p><strong>预期效果：</strong>{{ insight.expectedOutcome }}</p>
+          </div>
+        </div>
+      </el-dialog>
+      
+      <el-dialog v-model="trendAnalysisDialogVisible" title="情感趋势分析详情" width="80%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>情感趋势详细分析</h3>
+          <p>长期和短期情感趋势分析，识别情感变化的关键节点和影响因素：</p>
+          <div class="chart-placeholder">
+            <p>长期情感趋势图（30天）</p>
+            <div class="chart-wrapper" style="height: 450px;">
+        <v-chart :option="longTermTrendOption" autoresize />
+      </div>
+          </div>
+          <div class="trend-insights">
+            <h4>趋势洞察</h4>
+            <ul>
+              <li v-for="insight in trendInsights" :key="insight.id">{{ insight.text }}</li>
+            </ul>
+          </div>
+        </div>
+      </el-dialog>
+      
+      <el-dialog v-model="alertMonitoringDialogVisible" title="舆情预警详情" width="80%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>舆情预警详细信息</h3>
+          <p>当前需要重点关注的舆情预警和潜在风险：</p>
+          <el-table :data="alerts">
+            <el-table-column prop="id" label="ID"   />
+            <el-table-column prop="title" label="预警标题"   />
+            <el-table-column prop="type" label="类型"  >
               <template #default="{ row }">
-                  {{getChannelName(row.source)}}
+                <el-tag :type="row.type === 'risk' ? 'danger' : 'warning'">{{ getActionTypeName(row.type) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="sentiment" label="情感倾向"  >
+            <el-table-column prop="severity" label="严重程度"  >
               <template #default="{ row }">
-                <el-tag :type="row.sentiment === 'positive' ? 'success' : row.sentiment === 'negative' ? 'danger' : 'info'">
-                  {{ getEmotionName(row.sentiment) }}
-                </el-tag>
+                <el-tag :type="row.severity === 'high' ? 'danger' : row.severity === 'medium' ? 'warning' : 'info'">{{ getPriorityName(row.severity) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="intensity" label="情感强度"  >
+            <el-table-column prop="date" label="发生时间"   />
+            <el-table-column prop="status" label="状态"  >
               <template #default="{ row }">
-                  {{getIntensityName(row.intensity)}}
-              </template>
-            </el-table-column>
-            <el-table-column prop="timestamp" label="时间"   >
-              <template #default="{row}">
-                {{formatDate(row.timestamp, "yyyy-mm-dd hh:mm:ss")}}
+                <el-tag :type="row.status === 'pending' ? 'warning' : 'success'">{{ getAlertStatusName(row.status) }}</el-tag>
               </template>
             </el-table-column>
           </el-table>
         </div>
-      </div>
-    </el-dialog>
-    
-    <el-dialog v-model="emotionDistributionDialogVisible" title="多维度情感分布详情" width="80%" :before-close="closeDialog">
-      <div class="dialog-content">
-        <h3>多维度情感分布详细分析</h3>
-        <p>按照不同维度分析消费者情感分布情况：</p>
-        <el-tabs>
-          <el-tab-pane label="按渠道分布">
-            <div class="chart-placeholder">
-              <p>渠道情感分布对比图</p>
-              <div class="chart-wrapper" style="height: 400px;">
-          <v-chart :option="channelDistOption" autoresize />
+      </el-dialog>
+      
+      <el-dialog v-model="topicHotnessDialogVisible" title="热点话题详情" width="80%" :before-close="closeDialog">
+        <div class="dialog-content">
+          <h3>热点话题详细分析</h3>
+          <p>当前最受关注的话题及其情感倾向分析：</p>
+          <el-table :data="topics" style="width: 100%">
+            <el-table-column prop="rank" label="排名"   />
+            <el-table-column prop="name" label="话题名称" />
+            <el-table-column prop="mentions" label="提及次数"   />
+            <el-table-column prop="sentiment" label="情感倾向"  >
+              <template #default="{ row }">
+                <el-tag :type="row.sentiment === 'positive' ? 'success' : row.sentiment === 'negative' ? 'danger' : 'info'">{{ getEmotionName(row.sentiment) }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="trend" label="趋势"  >
+              <template #default="{ row }">
+                <span v-if="row.trend === 'rising'" style="color: green;">上升</span>
+                <span v-if="row.trend === 'falling'" style="color: red;">下降</span>
+                <span v-if="row.trend === 'stable'" style="color: orange;">平稳</span>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
-            </div>
-          </el-tab-pane>
-          <el-tab-pane label="按人群分布">
-            <div class="chart-placeholder">
-              <p>人群情感分布对比图</p>
-              <div class="chart-wrapper" style="height: 400px;">
-          <v-chart :option="userGroupDistOption" autoresize />
-        </div>
-            </div>
-          </el-tab-pane>
-          <el-tab-pane label="按产品线分布">
-            <div class="chart-placeholder">
-              <p>产品线情感分布对比图</p>
-              <v-chart :option="productLineDistOption" autoresize />
-            </div>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-    </el-dialog>
-    
-  <el-dialog v-model="marketingEffectDialogVisible" title="营销效果详情" width="80%" :before-close="closeDialog">
-    <div class="dialog-content">
-      <h3>营销活动效果详细分析</h3>
-      <p>近期开展的营销活动效果评估及情感影响分析：</p>
-      <div class="activity-detail" v-for="activity in marketingActivities" :key="activity.id" style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
-        <h4>{{ activity.name }}</h4>
-        <div class="activity-info-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
-          <p><strong>活动时间：</strong>{{ formatDate(activity.date, "yyyy-mm-dd") }}</p>
-          <p><strong>参与人数：</strong>{{ activity.participants }}</p>
-          <p><strong>情感影响度：</strong>{{ getEffectName(activity.effect) }}</p>
-          <p><strong>参与度：</strong>{{ activity.engagement }}%</p>
-          <p><strong>转化率：</strong>{{ activity.conversion }}%</p>
-        </div>
-        
-        <div class="activity-chart-container" style="height: 250px; width: 100%; background: #fafafa; padding: 10px; border-radius: 8px;">
-          <v-chart :option="getActivityTrendOption(activity)" autoresize /> </div>
-      </div>
+      </el-dialog>
     </div>
-  </el-dialog>
-    
-    <el-dialog v-model="insightSummaryDialogVisible" title="智能洞察摘要详情" width="80%" :before-close="closeDialog">
-      <div class="dialog-content">
-        <h3>AI自动生成的消费者情感洞察</h3>
-        <p>基于大数据和AI算法，自动生成的消费者情感洞察和行动建议：</p>
-        <div class="insight-detail" v-for="insight in detailedInsights" :key="insight.id" style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px;">
-          <h4>{{ insight.title }}</h4>
-          <p>{{ insight.description }}</p>
-          <p><strong>建议行动：</strong>{{ insight.recommendation }}</p>
-          <p><strong>紧急程度：</strong>{{ getPriorityName(insight.priority) }}</p>
-          <p><strong>预期效果：</strong>{{ insight.expectedOutcome }}</p>
-        </div>
-      </div>
-    </el-dialog>
-    
-    <el-dialog v-model="trendAnalysisDialogVisible" title="情感趋势分析详情" width="80%" :before-close="closeDialog">
-      <div class="dialog-content">
-        <h3>情感趋势详细分析</h3>
-        <p>长期和短期情感趋势分析，识别情感变化的关键节点和影响因素：</p>
-        <div class="chart-placeholder">
-          <p>长期情感趋势图（30天）</p>
-          <div class="chart-wrapper" style="height: 450px;">
-      <v-chart :option="longTermTrendOption" autoresize />
-    </div>
-        </div>
-        <div class="trend-insights">
-          <h4>趋势洞察</h4>
-          <ul>
-            <li v-for="insight in trendInsights" :key="insight.id">{{ insight.text }}</li>
-          </ul>
-        </div>
-      </div>
-    </el-dialog>
-    
-    <el-dialog v-model="alertMonitoringDialogVisible" title="舆情预警详情" width="80%" :before-close="closeDialog">
-      <div class="dialog-content">
-        <h3>舆情预警详细信息</h3>
-        <p>当前需要重点关注的舆情预警和潜在风险：</p>
-        <el-table :data="alerts">
-          <el-table-column prop="id" label="ID"   />
-          <el-table-column prop="title" label="预警标题"   />
-          <el-table-column prop="type" label="类型"  >
-            <template #default="{ row }">
-              <el-tag :type="row.type === 'risk' ? 'danger' : 'warning'">{{ getActionTypeName(row.type) }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column prop="severity" label="严重程度"  >
-            <template #default="{ row }">
-              <el-tag :type="row.severity === 'high' ? 'danger' : row.severity === 'medium' ? 'warning' : 'info'">{{ getPriorityName(row.severity) }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column prop="date" label="发生时间"   />
-          <el-table-column prop="status" label="状态"  >
-            <template #default="{ row }">
-              <el-tag :type="row.status === 'pending' ? 'warning' : 'success'">{{ getAlertStatusName(row.status) }}</el-tag>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-    </el-dialog>
-    
-    <el-dialog v-model="topicHotnessDialogVisible" title="热点话题详情" width="80%" :before-close="closeDialog">
-      <div class="dialog-content">
-        <h3>热点话题详细分析</h3>
-        <p>当前最受关注的话题及其情感倾向分析：</p>
-        <el-table :data="topics" style="width: 100%">
-          <el-table-column prop="rank" label="排名"   />
-          <el-table-column prop="name" label="话题名称" />
-          <el-table-column prop="mentions" label="提及次数"   />
-          <el-table-column prop="sentiment" label="情感倾向"  >
-            <template #default="{ row }">
-              <el-tag :type="row.sentiment === 'positive' ? 'success' : row.sentiment === 'negative' ? 'danger' : 'info'">{{ getEmotionName(row.sentiment) }}</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column prop="trend" label="趋势"  >
-            <template #default="{ row }">
-              <span v-if="row.trend === 'rising'" style="color: green;">上升</span>
-              <span v-if="row.trend === 'falling'" style="color: red;">下降</span>
-              <span v-if="row.trend === 'stable'" style="color: orange;">平稳</span>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElCard, ElSelect, ElSwitch, ElDialog, ElTable, ElTableColumn, ElTag, ElButton, ElTabs, ElTabPane } from 'element-plus'
+import { 
+  ElCard, ElSelect, ElSwitch, ElDialog, ElTable, ElTableColumn, 
+  ElTag, ElButton, ElTabs, ElTabPane, ElMessage, ElAlert,
+  ElDatePicker, ElPagination, ElForm, ElFormItem, ElStatistic, ElRow, ElCol
+} from 'element-plus'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -691,7 +766,259 @@ const loadingText = ref('正在加载数据...')
 const error = ref(null)
 const errorMessage = ref('')
 
-// 统计数据
+// ========== 新增：200条流水Mock数据 ==========
+const generateMockTransactions = (count = 200) => {
+  const stores = ['市中心店', '五一广场店', '岳麓山店', '高铁南站店'];
+  const paymentMethods = ['微信支付', '支付宝', '现金', '银行卡', '会员卡'];
+  const customerTypes = ['会员', '散客'];
+  const products = [
+    { name: '剁椒鱼头', category: '主菜', price: 98 },
+    { name: '辣椒炒肉', category: '主菜', price: 48 },
+    { name: '毛氏红烧肉', category: '主菜', price: 68 },
+    { name: '小炒黄牛肉', category: '主菜', price: 58 },
+    { name: '永州血鸭', category: '主菜', price: 55 },
+    { name: '口味虾', category: '特色菜', price: 88 },
+    { name: '口味蛇', category: '特色菜', price: 128 },
+    { name: '湘西土匪鸡', category: '特色菜', price: 78 },
+    { name: '干锅肥肠', category: '特色菜', price: 62 },
+    { name: '臭豆腐', category: '小吃', price: 12 },
+    { name: '糖油粑粑', category: '甜品', price: 8 },
+    { name: '刮凉粉', category: '小吃', price: 10 },
+    { name: '葱油饼', category: '小吃', price: 6 },
+    { name: '酒酿圆子', category: '甜品', price: 15 },
+    { name: '银耳莲子羹', category: '甜品', price: 12 },
+    { name: '湖藕汤', category: '汤类', price: 28 },
+    { name: '酸辣汤', category: '汤类', price: 18 },
+    { name: '三鲜汤', category: '汤类', price: 22 }
+  ];
+
+  const data = [];
+  // 使用最近30天的数据，确保包含今天
+  const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(today.getDate() - 29); // 最近30天
+  const endDate = today;
+
+  // 确保今天有一些数据
+  const todayStr = today.toISOString().split('T')[0];
+  const todayTransactionsCount = Math.floor(count * 0.3); // 今天占30%
+  
+  // 生成今天的交易数据
+  for (let i = 0; i < todayTransactionsCount; i++) {
+    const hour = Math.floor(Math.random() * 14) + 8; // 8:00 - 22:00
+    const minute = Math.floor(Math.random() * 60);
+    const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+
+    const product = products[Math.floor(Math.random() * products.length)];
+    const quantity = Math.floor(Math.random() * 3) + 1;
+    const total = product.price * quantity;
+
+    data.push({
+      transaction_id: `TX${todayStr.replace(/-/g, '')}${String(i).padStart(4, '0')}`,
+      date: todayStr,
+      time: timeStr,
+      product_name: product.name,
+      category: product.category,
+      quantity: quantity,
+      unit_price: product.price,
+      total_amount: total,
+      payment_method: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
+      customer_type: customerTypes[Math.floor(Math.random() * customerTypes.length)],
+      store_location: stores[Math.floor(Math.random() * stores.length)]
+    });
+  }
+
+  // 生成其他日期的交易数据
+  const otherTransactionsCount = count - todayTransactionsCount;
+  for (let i = 0; i < otherTransactionsCount; i++) {
+    const date = new Date(startDate.getTime() + Math.random() * (endDate - startDate));
+    const dateStr = date.toISOString().split('T')[0];
+    const hour = Math.floor(Math.random() * 14) + 8; // 8:00 - 22:00
+    const minute = Math.floor(Math.random() * 60);
+    const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+
+    const product = products[Math.floor(Math.random() * products.length)];
+    const quantity = Math.floor(Math.random() * 3) + 1;
+    const total = product.price * quantity;
+
+    data.push({
+      transaction_id: `TX${dateStr.replace(/-/g, '')}${String(i + 1000).padStart(4, '0')}`,
+      date: dateStr,
+      time: timeStr,
+      product_name: product.name,
+      category: product.category,
+      quantity: quantity,
+      unit_price: product.price,
+      total_amount: total,
+      payment_method: paymentMethods[Math.floor(Math.random() * paymentMethods.length)],
+      customer_type: customerTypes[Math.floor(Math.random() * customerTypes.length)],
+      store_location: stores[Math.floor(Math.random() * stores.length)]
+    });
+  }
+  
+  // 按日期和时间排序
+  data.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+  return data;
+};
+
+const allTransactions = ref(generateMockTransactions(200));
+
+// ========== 总体信息弹窗筛选 ==========
+const overviewFilters = ref({
+  dateRange: [],
+  stores: [],
+  paymentMethods: []
+});
+
+// 门店、支付方式选项（从数据中动态提取）
+const storeOptions = computed(() => [...new Set(allTransactions.value.map(t => t.store_location))]);
+const paymentMethodOptions = computed(() => [...new Set(allTransactions.value.map(t => t.payment_method))]);
+
+// 过滤后的数据（用于总体弹窗）
+const filteredOverviewTransactions = computed(() => {
+  return allTransactions.value.filter(t => {
+    // 日期范围
+    if (overviewFilters.value.dateRange && overviewFilters.value.dateRange.length === 2) {
+      const date = t.date;
+      if (date < overviewFilters.value.dateRange[0] || date > overviewFilters.value.dateRange[1]) return false;
+    }
+    // 门店
+    if (overviewFilters.value.stores.length && !overviewFilters.value.stores.includes(t.store_location)) return false;
+    // 支付方式
+    if (overviewFilters.value.paymentMethods.length && !overviewFilters.value.paymentMethods.includes(t.payment_method)) return false;
+    return true;
+  });
+});
+
+// 基于过滤后数据计算统计指标（用于总体弹窗）
+const filteredStats = computed(() => {
+  const trans = filteredOverviewTransactions.value;
+  const totalSales = trans.reduce((sum, t) => sum + t.total_amount, 0);
+  const orderCount = trans.length;
+  const avgOrderValue = orderCount ? (totalSales / orderCount).toFixed(2) : 0;
+  return {
+    totalSales: '¥' + totalSales.toLocaleString(),
+    orderCount,
+    avgOrderValue: '¥' + avgOrderValue,
+  };
+});
+
+// 动态趋势图配置（按小时聚合）
+const filteredTrendOption = computed(() => {
+  const hourData = Array(24).fill(0).map(() => ({ amount: 0, count: 0 }));
+  filteredOverviewTransactions.value.forEach(t => {
+    const hour = parseInt(t.time.split(':')[0]);
+    hourData[hour].amount += t.total_amount;
+    hourData[hour].count += 1;
+  });
+  const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2,'0')}:00`);
+  const amountData = hourData.map(h => h.amount);
+  const countData = hourData.map(h => h.count);
+
+  const option = JSON.parse(JSON.stringify(transactionTrendOption.value));
+  option.xAxis.data = hours;
+  option.series[0].data = amountData;
+  option.series[1].data = countData;
+  return option;
+});
+
+// 动态产品销售分布（各品类销售金额）
+const filteredProductOption = computed(() => {
+  const categoryAmount = {};
+  filteredOverviewTransactions.value.forEach(t => {
+    categoryAmount[t.category] = (categoryAmount[t.category] || 0) + t.total_amount;
+  });
+  const data = Object.entries(categoryAmount).map(([name, value]) => ({ name, value }));
+  const option = JSON.parse(JSON.stringify(productDistributionOption.value));
+  option.series[0].data = data;
+  return option;
+});
+
+const applyOverviewFilters = () => {
+  // 可加加载状态
+};
+const resetOverviewFilters = () => {
+  overviewFilters.value = { dateRange: [], stores: [], paymentMethods: [] };
+};
+
+// ========== 详细信息弹窗筛选 + 分页 ==========
+const detailFilters = ref({
+  dateRange: [],
+  stores: [],
+  paymentMethods: []
+});
+
+const filteredDetails = computed(() => {
+  return allTransactions.value.filter(t => {
+    if (detailFilters.value.dateRange && detailFilters.value.dateRange.length === 2) {
+      if (t.date < detailFilters.value.dateRange[0] || t.date > detailFilters.value.dateRange[1]) return false;
+    }
+    if (detailFilters.value.stores.length && !detailFilters.value.stores.includes(t.store_location)) return false;
+    if (detailFilters.value.paymentMethods.length && !detailFilters.value.paymentMethods.includes(t.payment_method)) return false;
+    return true;
+  });
+});
+
+const currentPage = ref(1);
+const pageSize = ref(20);
+const paginatedDetails = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  const end = start + pageSize.value;
+  return filteredDetails.value.slice(start, end);
+});
+
+const filteredDetailStats = computed(() => {
+  const trans = filteredDetails.value;
+  const totalOrders = trans.length;
+  // 模拟已完成/进行中（假设所有订单都是已完成）
+  const completedOrders = trans.length;
+  const pendingOrders = 0;
+  return { totalOrders, completedOrders, pendingOrders };
+});
+
+const applyDetailFilters = () => {
+  currentPage.value = 1;
+};
+const resetDetailFilters = () => {
+  detailFilters.value = { dateRange: [], stores: [], paymentMethods: [] };
+  currentPage.value = 1;
+};
+const handleSizeChange = (size) => {
+  pageSize.value = size;
+  currentPage.value = 1;
+};
+const handleCurrentChange = (page) => {
+  currentPage.value = page;
+};
+
+// ========== 原有统计数据（可保留，但卡片上的今日数据建议基于mock计算） ==========
+// 计算今日数据（基于mock中日期为今天的交易）
+const todayStr = new Date().toISOString().split('T')[0];
+const todayTransactions = computed(() => allTransactions.value.filter(t => t.date === todayStr));
+
+const transactionStats = computed(() => {
+  const trans = todayTransactions.value;
+  const totalSales = trans.reduce((sum, t) => sum + t.total_amount, 0);
+  const orderCount = trans.length;
+  const avgOrderValue = orderCount ? (totalSales / orderCount).toFixed(2) : 0;
+  const totalOrders = allTransactions.value.length;
+  const completedOrders = totalOrders; // 假设全部完成
+  const pendingOrders = 0;
+  return {
+    totalSales: '¥' + totalSales.toLocaleString(),
+    orderCount,
+    avgOrderValue: '¥' + avgOrderValue,
+    totalOrders,
+    completedOrders,
+    pendingOrders
+  };
+});
+
+// 原有流水数据详细信息（可弃用，现用分页数据代替）
+// 保留但不再使用，或者可以清空
+// const transactionDetails = ref([]);
+
+// 原有统计数据（情感部分）
 const stats = ref({
   totalReviews: 1245,
   positiveCount: 789,
@@ -701,220 +1028,6 @@ const stats = ref({
   alertCount: 12,
   hotTopicCount: 8,
   topTopic: "新品发布"
-})
-
-// 流水数据统计
-const transactionStats = ref({
-  totalSales: '¥128,450',
-  orderCount: 156,
-  avgOrderValue: '¥823',
-  totalOrders: 1245,
-  completedOrders: 1120,
-  pendingOrders: 125
-})
-
-// 流水数据详细信息
-const transactionDetails = ref([
-  {
-    transaction_id: 'TX20231201001',
-    date: '2023-12-01',
-    time: '10:25',
-    product_name: '剁椒鱼头',
-    category: '主菜',
-    quantity: 2,
-    unit_price: 98.00,
-    total_amount: 196.00,
-    payment_method: '微信支付',
-    customer_type: '会员',
-    store_location: '市中心店'
-  },
-  {
-    transaction_id: 'TX20231201002',
-    date: '2023-12-01',
-    time: '10:30',
-    product_name: '辣椒炒肉',
-    category: '主菜',
-    quantity: 1,
-    unit_price: 48.00,
-    total_amount: 48.00,
-    payment_method: '支付宝',
-    customer_type: '散客',
-    store_location: '市中心店'
-  },
-  {
-    transaction_id: 'TX20231201003',
-    date: '2023-12-01',
-    time: '10:35',
-    product_name: '口味虾',
-    category: '特色菜',
-    quantity: 1,
-    unit_price: 88.00,
-    total_amount: 88.00,
-    payment_method: '现金',
-    customer_type: '会员',
-    store_location: '市中心店'
-  },
-  {
-    transaction_id: 'TX20231201004',
-    date: '2023-12-01',
-    time: '10:40',
-    product_name: '臭豆腐',
-    category: '小吃',
-    quantity: 3,
-    unit_price: 12.00,
-    total_amount: 36.00,
-    payment_method: '微信支付',
-    customer_type: '散客',
-    store_location: '市中心店'
-  },
-  {
-    transaction_id: 'TX20231201005',
-    date: '2023-12-01',
-    time: '10:45',
-    product_name: '糖油粑粑',
-    category: '甜品',
-    quantity: 2,
-    unit_price: 8.00,
-    total_amount: 16.00,
-    payment_method: '支付宝',
-    customer_type: '会员',
-    store_location: '市中心店'
-  }
-])
-
-// 流水趋势图表配置
-const transactionTrendOption = ref({
-  title: {
-    text: '今日流水趋势',
-    left: 'center',
-    textStyle: {
-      fontSize: 16,
-      fontWeight: 'bold'
-    }
-  },
-  tooltip: {
-    trigger: 'axis',
-    axisPointer: {
-      type: 'cross'
-    }
-  },
-  legend: {
-    data: ['流水金额', '订单数量'],
-    top: '10%'
-  },
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
-    containLabel: true
-  },
-  xAxis: {
-    type: 'category',
-    boundaryGap: false,
-    data: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00']
-  },
-  yAxis: [
-    {
-      type: 'value',
-      name: '流水金额(元)',
-      position: 'left',
-      axisLabel: {
-        formatter: '{value}'
-      }
-    },
-    {
-      type: 'value',
-      name: '订单数量',
-      position: 'right',
-      axisLabel: {
-        formatter: '{value}'
-      }
-    }
-  ],
-  series: [
-    {
-      name: '流水金额',
-      type: 'line',
-      smooth: true,
-      data: [12000, 18000, 25000, 22000, 28000, 35000, 28000, 15000],
-      smoothMonotone: 'x',
-      lineStyle: {
-        color: '#52c41a',
-        width: 3
-      },
-      areaStyle: {
-        color: {
-          type: 'linear',
-          x: 0, y: 0, x2: 0, y2: 1,
-          colorStops: [
-            { offset: 0, color: 'rgba(82, 196, 26, 0.3)' },
-            { offset: 1, color: 'rgba(82, 196, 26, 0.05)' }
-          ]
-        }
-      }
-    },
-    {
-      name: '订单数量',
-      type: 'bar',
-      yAxisIndex: 1,
-      data: [12, 18, 25, 22, 28, 35, 28, 15],
-      itemStyle: {
-        color: '#1890ff'
-      }
-    }
-  ]
-})
-
-// 产品销售分布图表配置
-const productDistributionOption = ref({
-  title: {
-    text: '产品销售分布',
-    left: 'center',
-    textStyle: {
-      fontSize: 16,
-      fontWeight: 'bold'
-    }
-  },
-  tooltip: {
-    trigger: 'item',
-    formatter: '{a} <br/>{b}: {c} ({d}%)'
-  },
-  legend: {
-    orient: 'vertical',
-    left: 'left',
-    data: ['剁椒鱼头', '辣椒炒肉', '口味虾', '臭豆腐', '糖油粑粑']
-  },
-  series: [
-    {
-      name: '销售额分布',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: false,
-      itemStyle: {
-        borderRadius: 10,
-        borderColor: '#fff',
-        borderWidth: 2
-      },
-      label: {
-        show: true,
-        formatter: '{b}: {d}%'
-      },
-      emphasis: {
-        label: {
-          show: true,
-          fontSize: 16,
-          fontWeight: 'bold'
-        }
-      },
-      data: [
-        { value: 35, name: '剁椒鱼头', itemStyle: { color: '#ff4d4f' } },
-        { value: 25, name: '辣椒炒肉', itemStyle: { color: '#fa8c16' } },
-        { value: 20, name: '口味虾', itemStyle: { color: '#fa541c' } },
-        { value: 12, name: '臭豆腐', itemStyle: { color: '#722ed1' } },
-        { value: 8, name: '糖油粑粑', itemStyle: { color: '#f5222d' } }
-      ]
-    }
-  ]
 })
 
 // 情感分布数据
@@ -1068,7 +1181,7 @@ const longTermTrendOption = computed(() => ({
         colorStops: [{ offset: 0, color: 'rgba(64, 158, 255, 0.5)' }, { offset: 1, color: 'rgba(64, 158, 255, 0)' }]
       }
     },
-    data: [/* 30个随机数值 */ 120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 180, 250]
+    data: [120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 120, 132, 101, 134, 90, 230, 210, 180, 250]
   }]
 }));
 
@@ -1076,32 +1189,27 @@ const generateTrendData = (base, type, seed) => {
   const points = 7;
   const data = [];
   for (let i = 0; i < points; i++) {
-    // 使用 seed 和索引 i 制造差异，并结合 type（正面/负面）决定走向
     const randomOffset = Math.sin(seed + i) * 10; 
     let value;
     if (type === 'positive') {
-      value = base + (i * 5) + randomOffset; // 总体上升
+      value = base + (i * 5) + randomOffset;
     } else if (type === 'negative') {
-      value = base - (i * 3) + randomOffset; // 总体下降
+      value = base - (i * 3) + randomOffset;
     } else {
-      value = base + randomOffset; // 平稳波动
+      value = base + randomOffset;
     }
-    data.push(Math.max(0, Math.round(value))); // 确保不为负数
+    data.push(Math.max(0, Math.round(value)));
   }
   return data;
 };
 
 const getActivityTrendOption = (activity) => {
-  // 1. 颜色差异化
   const themeColor = activity.effect === 'positive' ? '#67C23A' : (activity.effect === 'negative' ? '#F56C6C' : '#409EFF');
-
-  // 2. 数据差异化：利用参与度作为基数，id作为随机种子，effect作为趋势导向
   const uniqueData = generateTrendData(
     activity.engagement || 50, 
     activity.effect, 
     activity.id
   );
-
   return {
     title: {
       text: `${activity.name} - 情感趋势走势`,
@@ -1133,7 +1241,7 @@ const getActivityTrendOption = (activity) => {
         smooth: true,
         symbol: 'circle',
         symbolSize: 8,
-        data: uniqueData, // 这里的每一行数据现在都是唯一的
+        data: uniqueData,
         itemStyle: { color: themeColor },
         areaStyle: {
           color: {
@@ -1267,7 +1375,6 @@ const toggleStream = () => {
 // 执行洞察建议的方法
 const takeAction = (action) => {
   console.log('执行行动:', action)
-  // 这里可以实现具体的业务逻辑
   switch(action) {
     case 'continue_quality_improvement':
       ElMessage.success('已安排继续推进质量改进措施')
@@ -1303,7 +1410,7 @@ const handleLogout = () => {
   router.push('/login')
 }
 
-// 从后端API获取数据
+// 从后端API获取数据（情感部分，保留）
 const fetchData = async () => {
   loading.value = true
   loadingText.value = '正在加载数据...'
@@ -1311,7 +1418,6 @@ const fetchData = async () => {
   errorMessage.value = ''
   
   try {
-    // 使用批量数据API，减少HTTP请求次数
     const data_url = import.meta.env.VITE_SERVER_API_ENDPOINT || "http://localhost:8000";
     const batchResponse = await axios.get( data_url + '/batch-data', {
       params: { time_range: timeRange.value }
@@ -1319,7 +1425,6 @@ const fetchData = async () => {
     
     const batchData = batchResponse.data
 
-    // 更新数据
     stats.value = batchData.stats
     emotionDistribution.value = batchData.emotionDistribution
     recentComments.value = batchData.recentComments
@@ -1330,8 +1435,6 @@ const fetchData = async () => {
     trendInsights.value = batchData.trendInsights
     alerts.value = batchData.alerts
     topics.value = batchData.topics
-    console.log("batchData:",batchData);
-    console.log("insight Data: ", batchData.insights);
     console.log('数据加载成功')
   } catch (err) {
     console.error('数据加载失败:', err)
@@ -1538,12 +1641,141 @@ const emotionClassificationOption = ref({
   ]
 });
 
+// 原有流水趋势图表配置保持不变
+const transactionTrendOption = ref({
+  title: {
+    text: '今日流水趋势',
+    left: 'center',
+    textStyle: {
+      fontSize: 16,
+      fontWeight: 'bold'
+    }
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross'
+    }
+  },
+  legend: {
+    data: ['流水金额', '订单数量'],
+    top: '10%'
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    data: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00']
+  },
+  yAxis: [
+    {
+      type: 'value',
+      name: '流水金额(元)',
+      position: 'left',
+      axisLabel: {
+        formatter: '{value}'
+      }
+    },
+    {
+      type: 'value',
+      name: '订单数量',
+      position: 'right',
+      axisLabel: {
+        formatter: '{value}'
+      }
+    }
+  ],
+  series: [
+    {
+      name: '流水金额',
+      type: 'line',
+      smooth: true,
+      data: [12000, 18000, 25000, 22000, 28000, 35000, 28000, 15000],
+      smoothMonotone: 'x',
+      lineStyle: {
+        color: '#52c41a',
+        width: 3
+      },
+      areaStyle: {
+        color: {
+          type: 'linear',
+          x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(82, 196, 26, 0.3)' },
+            { offset: 1, color: 'rgba(82, 196, 26, 0.05)' }
+          ]
+        }
+      }
+    },
+    {
+      name: '订单数量',
+      type: 'bar',
+      yAxisIndex: 1,
+      data: [12, 18, 25, 22, 28, 35, 28, 15],
+      itemStyle: {
+        color: '#1890ff'
+      }
+    }
+  ]
+});
+
+// 产品销售分布图表配置（作为动态图表的基础模板）
+const productDistributionOption = ref({
+  title: {
+    text: '产品销售分布',
+    left: 'center',
+    textStyle: {
+      fontSize: 16,
+      fontWeight: 'bold'
+    }
+  },
+  tooltip: {
+    trigger: 'item',
+    formatter: '{a} <br/>{b}: {c} ({d}%)'
+  },
+  legend: {
+    orient: 'vertical',
+    left: 'left',
+    data: [] // 动态
+  },
+  series: [
+    {
+      name: '销售额分布',
+      type: 'pie',
+      radius: ['40%', '70%'],
+      avoidLabelOverlap: false,
+      itemStyle: {
+        borderRadius: 10,
+        borderColor: '#fff',
+        borderWidth: 2
+      },
+      label: {
+        show: true,
+        formatter: '{b}: {d}%'
+      },
+      emphasis: {
+        label: {
+          show: true,
+          fontSize: 16,
+          fontWeight: 'bold'
+        }
+      },
+      data: [] // 动态
+    }
+  ]
+});
+
 onMounted(async () => {
   console.log('情感分析仪表盘组件已挂载')
-  // 初始加载数据
   await fetchData()
 })
 </script>
+
 
 <style scoped>
 .dashboard {

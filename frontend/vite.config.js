@@ -53,7 +53,7 @@ export default defineConfig({
 server: {
   proxy: {
     '/chat-api': {
-      target: "http://26.146.41.194:4367",
+      target: "http://localhost:8080",
       changeOrigin: true,
       rewrite: (path) => path.replace(/^\/chat-api/, '')
     },

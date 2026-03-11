@@ -83,6 +83,7 @@ const scrollContainer = ref<HTMLElement | null>(null);
 
 const API_ENDPOINT = import.meta.env.VITE_OPENAI_API_ENDPOINT;
 const API_KEY = import.meta.env.VITE_OPENAI_API_SERCET;
+const API_MODEL_NAME = import.meta.env.VITE_OPENAI_API_MODEL;
 
 const finalSystemPrompt = computed(() => {
   let content = props.systemRole;
@@ -138,7 +139,7 @@ const handleSend = async () => {
         'Authorization': `Bearer ${API_KEY}`
       },
       body: JSON.stringify({
-        model: 'qwen3-8b',
+        model: API_MODEL_NAME,
         messages: [{ role: 'system', content: finalSystemPrompt.value }, ...history],
         stream: true
       })
